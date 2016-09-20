@@ -1,0 +1,60 @@
+{
+  "name": "media-manager",
+  "version": "1.0.0",
+  "authors": [
+    "S. Francis"
+  ],
+  "description": "media manager dialog component",
+  "keywords": [
+    "web-component",
+    "polymer"
+  ],
+  "main": "media-manager.html",
+  "license": "MIT",
+  "homepage": "https://github.com/EllipticalElements/media-manager",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/",
+    ".gitignore",
+    ".npmignore",
+    "gulpfile.js",
+    "lib",
+    "docs",
+    "index.js",
+    "umd.js",
+    "package.json",
+    "demo",
+    "build.json",
+    "bundle.json",
+    ".nvmrc",
+    ".eslintrc",
+    "bin",
+    "CHANGELOG.md",
+    "demos",
+    "stylesheets",
+    "_index.scss",
+    "bk"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "elliptical-polymer-behaviors": "~1.2.1",
+    "md-fonts": "~1.0.3",
+    "md-icons": "~1.2.0",
+    "paper-button": "~1.0.13",
+    "sass-md-components": "~1.1.11",
+    "ui-input-addon": "~1.2.1",
+    "md-input": "~1.2.2",
+    "md-upload": "~1.0.0",
+    "paper-tooltip": "~1.1.2",
+    "paper-spinner": "~1.2.0",
+    "elliptical-file": "~1.0.0",
+    "jquery-finger-import": "~1.0.0",
+    "iron-icons":"PolymerElements/iron-icons#~1.1.3",
+    "jquery-ui-import":"1.0.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}

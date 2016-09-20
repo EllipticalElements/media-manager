@@ -1,0 +1,2380 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../md-fonts/md-fonts.html">
+<link rel="import" href="../md-icons/md-icons.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../sass-md-components/sass-md-components.html">
+<link rel="import" href="../elliptical-polymer-behaviors/component-behavior.html">
+<link rel="import" href="../elliptical-polymer-behaviors/modal-behavior.html">
+<link rel="import" href="../elliptical-polymer-behaviors/utils-behavior.html">
+<link rel="import" href="../ui-input-addon/ui-input-addon.html">
+<link rel="import" href="../md-input/md-input.html">
+<link rel="import" href="../md-input/md-checkbox.html">
+<link rel="import" href="../md-upload/md-upload.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
+<link rel="import" href="../jquery-finger-import/jquery-finger.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/image-icons.html">
+<link rel="import" href="../iron-icons/device-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+<link rel="import" href="../jquery-ui-import/sortable.html">
+
+<!--
+  css variables
+  --media-manager-border:1px solid #e2e2e2
+  --media-manager-header-input-color:rgba(255,255,255,1)
+  --media-manager-accent-color:#60bc57
+  --media-manager-accent-font-color: #fff
+  --media-manager-primary-color: #3899ec
+  --media-manager-primary-font-color: #fff
+  --media-manager-secondary-color:#fb7d33
+  --media-manager-secondary-font-color: #fff
+  --media-manager-text-color: #646464
+  --media-manager-text-light-color: #9e9e9e
+  --media-manager-header-icon-color: rgba(255,255,255,.9)
+  --media-manager-header-icon-color-active: rgba(255, 255, 255, 1)
+  --media-manager-header-icon-color-hover: rgba(255,255,255,1)
+  --media-manager-header-icon-color-inactive: rgba(255,255,255,.5)
+  --media-manager-aside-color: #f0f3f5
+  --media-manager-aside-link-color-inactive: #bcbcbc
+  --media-manager-transition: all 0.25s linear
+  --media-manager-info-transition: all 0.15s linear
+  --media-manager-icon-color: #BDBDBD
+  --media-manager-tooltip-color: #212121
+
+-->
+<style>
+  media-manager md-input input[type=text] {
+    border-bottom: var(--media-manager-border, 1px solid #e2e2e2);
+  }
+
+  media-manager md-input input[type=text][readonly=readonly] {
+    border-bottom: var(--media-manager-border, 1px solid #e2e2e2) !important;
+  }
+
+  media-manager md-input input[type=text][readonly=readonly]:focus {
+    border-bottom: var(--media-manager-border, 1px solid #e2e2e2) !important;
+  }
+
+  media-manager > header ui-input-addon input[type=text] {
+    color: var(--media-manager-header-input-color, rgba(255, 255, 255, 1));
+    background: none !important;
+    border: 0;
+    outline: 0;
+  }
+
+  media-manager > header ui-input-addon input[type=text]:focus {
+    border: 0;
+    outline: 0 !important;
+  }
+
+  media-manager > header ui-input-addon .ui-button {
+    color: var(--media-manager-header-input-color, rgba(255, 255, 255, 1));
+    background: none !important;
+    border: 0;
+    outline: 0;
+  }
+
+  media-manager > header ui-input-addon .ui-button:hover {
+    color: var(--media-manager-header-input-color, rgba(255, 255, 255, 1));
+    background: none !important;
+    border: 0;
+    outline: 0;
+  }
+
+  media-manager > header ui-input-addon .ui-button:active {
+    box-shadow: none;
+  }
+</style>
+<dom-module id="media-manager">
+  <style>
+    :host {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      right: 10%;
+      box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.4);
+      height: 75%;
+      background: #fff;
+      z-index: 9999;
+      font-family: 'robotoregular';
+    }
+
+    :host.hide {
+      display: none;
+    }
+
+    :host .hidden {
+      opacity:0;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host .hide{
+      display:none;
+    }
+
+    :host .size-14 {
+      font-size: 14px;
+    }
+
+    :host .full-width {
+      width:100%;
+    }
+
+    :host .flex-container{
+      display: -webkit-flex;
+      display: flex;
+    }
+
+    :host h4{
+      font-size: 1.68em;
+    }
+
+    :host .icon{
+      color:var(--media-manager-icon-color, #BDBDBD);
+      transition: var(--media-manager-transition, all 0.25s linear);
+      cursor:pointer;
+    }
+
+    :host .icon:hover{
+      color: var(--media-manager-icon-color-hover, #757575);
+    }
+
+    :host .icon.nav{
+      color:var(--media-manager-icon-nav-color, #757575);
+      transition: var(--media-manager-transition, all 0.25s linear);
+      cursor:pointer;
+    }
+
+    :host .icon.nav:hover{
+      color:var(--media-manager-icon-nav-color-hover, #212121);
+      transition: var(--media-manager-transition, all 0.25s linear);
+      cursor:pointer;
+    }
+
+    :host .center{
+      -webkit-justify-content: center;
+      justify-content: center;
+    }
+
+    :host .align-center{
+      -webkit-align-items: center;
+      align-items: center;
+    }
+
+    :host .margin-right.half{
+      margin-right:.5em;
+    }
+
+    :host .margin-right{
+      margin-right:1em;
+    }
+
+    :host .large-margin-right{
+      margin-right:1em;
+    }
+
+    :host .margin-right.two{
+      margin-right:2em;
+    }
+
+    :host .margin-left{
+      margin-left:1em;
+    }
+
+    :host .margin-left.two{
+      margin-left:2em;
+    }
+
+    :host .margin-left.half{
+      margin-left:.5em;
+    }
+
+    :host .margin-bottom{
+      margin-bottom:1em;
+    }
+
+    :host .margin-bottom.two{
+      margin-bottom:2em;
+    }
+
+    :host .margin-top{
+      margin-top:1em;
+    }
+
+    :host .margin-top.two{
+      margin-top:2em;
+    }
+
+    :host .file-add {
+      background: var(--media-manager-accent-color, #60bc57);
+      color: var(--media-manager-accent-font-color, #fff);
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host .swipe{
+      opacity:0 !important;
+      transition:  all 0.25s linear;
+      max-height:0;
+      max-width:0;
+      font-size:0 !important;
+      margin:0;
+    }
+
+    :host #backArrow{
+      font-size:48px;
+      transition: var(--media-manager-transition, all 0.25s linear);
+      opacity:1;
+      color: var(--media-manager-secondary-color, #fb7d33);
+      margin-right:.5em;
+      cursor:pointer;
+    }
+
+    :host .file-add.fade {
+      opacity:0;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host paper-button{
+      line-height:normal;
+    }
+
+    :host paper-tooltip{
+      --paper-tooltip-background:var(--media-manager-tooltip-color, #212121);
+    }
+
+    :host md-input{
+      color: var(--media-manager-text-color, #646464);
+    }
+
+    :host .primary-color{
+      color: var(--media-manager-primary-color, #3899ec);
+    }
+
+    :host .accent-color{
+      color: var(--media-manager-accent-color, #60bc57);
+    }
+
+    :host .secondary-color{
+      color: var(--media-manager-secondary-color, #fb7d33);
+    }
+
+    :host .text-color{
+      color: var(--media-manager-text-color, #646464);
+    }
+
+    :host > header {
+      background: var(--media-manager-primary-color, #3899ec);
+      width: 100%;
+      min-height: 55px;
+      color: var(--media-manager-primary-font-color, #fff);
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+      padding: 0 1.25em;
+    }
+
+    :host > header > div {
+      display: -webkit-flex;
+      display: flex;
+
+    }
+    :host > header  .icon-container{
+      margin-right: .5em;
+      display: -webkit-flex;
+      display: flex;
+      align-items:center;
+    }
+    :host > header .icon-container > span {
+      color: var(--media-manager-header-icon-color, rgba(255, 255, 255, .8));
+      cursor:pointer;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+    :host > header .icon-container > iron-icon {
+      color: var(--media-manager-header-icon-color, rgba(255, 255, 255, .8));
+      cursor:pointer;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+    :host > header .icon-container > .inactive {
+      color: var(--media-manager-header-icon-color-inactive, rgba(255, 255, 255, .3));
+      cursor:default;
+    }
+
+    :host > header .icon-container > .inactive:hover {
+      color: var(--media-manager-header-icon-color-inactive, rgba(255, 255, 255, .3));
+      cursor:default;
+    }
+
+    :host > header .icon-container > .active {
+      color: var(--media-manager-header-icon-color-active, rgba(255, 255, 255, 1));
+      cursor:default;
+    }
+
+    :host > header .icon-container > iron-icon:hover {
+      color: var(--media-manager-header-icon-color-hover, rgba(255, 255, 255, 1));
+      cursor: pointer;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+
+    :host > header > .search {
+      width: 350px;
+    }
+
+    :host > section {
+      -webkit-flex-grow: 3;
+      flex-grow: 3;
+      display: -webkit-flex;
+      display: flex;
+    }
+
+    :host > section > div {
+      width: 80%;
+    }
+
+    :host > section > aside {
+      width: 20%;
+      border-left: var(--galery-editor-border, 1px solid #e2e2e2);
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;;
+      align-items: center;
+    }
+
+    :host > section > aside .camera-container {
+      width: 100%;
+      height: 35%;
+      background: var(--media-manager-image-preview-color, #eaf7ff);
+      color: var(--media-manager-primary-color, #3899ec);
+      border-bottom: var(--galery-editor-border, 1px solid #e2e2e2);
+      position: relative;
+      min-height:150px;
+    }
+
+
+    :host > section > aside .camera-container iron-icon {
+      height: 64px;
+      width:64px;
+      position: absolute;
+      top: 30%;
+      left: 38%;
+      color: var(--media-manager-primary-color, #3899ec);
+    }
+
+    :host > section > aside .camera-container.active{
+      background:#fff;
+    }
+
+    :host > section > aside .camera-container.active iron-icon {
+      display:none;
+    }
+
+    :host > section > aside .camera-container .camera-file-container{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: center;
+      justify-content: center;
+      width:100%;
+      height:100%;
+      overflow: hidden;
+      position:relative;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host > section > aside .camera-container .camera-file-container  .camera-file-inner-container{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-align-items:center;
+      align-items: center;
+      width:100%;
+      height:100%;
+    }
+
+    :host > section > aside .camera-container .camera-file-container  .camera-file-inner-container .camera-nested-inner-container{
+      max-height:100%;
+    }
+
+    :host > section > aside .camera-container .camera-file-container .info-container{
+      bottom: 0;
+      height: 30px;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      -webkit-justify-content: flex-end;
+      justify-content: flex-end;
+      -webkit-align-items: center;
+      align-items: center;
+    }
+
+    :host > section > aside header {
+      background: var(--media-manager-aside-color, #f0f3f5);
+      border-bottom: var(--galery-editor-border, 1px solid #e2e2e2);
+      padding: .65em;
+      color: var(--media-manager-image-label-color, #2b5672);
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: center;
+      justify-content: center;
+    }
+
+    :host > section > aside section {
+      padding-left:1em;
+      overflow-y:scroll;
+    }
+
+    :host > section > aside section [scrollable]{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    }
+
+    :host > section > aside md-input {
+      width: 90%;
+    }
+
+    :host > section > aside .link-box {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;;
+      align-items: center;
+      width: 90%;
+    }
+
+    :host > section > aside .link-box .link {
+      color: var(--media-manager-accent-color, #60bc57);
+      cursor:pointer;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host > section > aside .link-box .link.inactive {
+      color: var(--media-manager-aside-link-color-inactive, #bcbcbc);
+      cursor: default;
+    }
+
+    :host > section > aside .target-box{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      width:100%;
+      margin-top:24px;
+      max-height:30px;
+    }
+
+    :host > section > aside .target-box>span{
+      margin:-.5em 1em 0 0;
+      color:var(--media-manager-text-light-color, #9e9e9e);
+    }
+
+    :host > section > .main-container {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;;
+      align-items: center;
+      padding: 0 1.5em .75em 1.5em;
+    }
+
+    :host > section > .main-container > header {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      min-height: 64px;
+    }
+
+    :host > section > .main-container > header paper-button {
+      font-size: 14px;
+    }
+
+    :host > section > .main-container > section {
+      -webkit-flex-grow: 3;
+      flex-grow: 3;
+      overflow-y: scroll;
+      border-top: var(--galery-editor-border, 1px solid #e2e2e2);
+      padding: 1em 0 2em 0;
+    }
+
+    :host > section > .main-container > header .label-total {
+      color: var(--media-manager-text-color, #646464);
+    }
+
+    :host > section > .main-container > section > .upload-container {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      margin-top: 3em;
+      color: var(--media-manager-text-color, #646464);
+    }
+
+    :host > section > .main-container > section > .upload-container.hide {
+      display: none;
+    }
+
+    :host > section > .main-container > section > .upload-container p {
+      font-size: 14px;
+    }
+
+    :host > section > .main-container > section > .upload-container h4 {
+      color: var(--media-manager-accent-color, #60bc57);
+    }
+
+    :host > section > .main-container > section  .flex-library {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+      flex-wrap:wrap;
+      padding-left:.5em;
+    }
+
+    :host > section > .main-container > section  .flex-library .file-outer-container{
+      margin:0 1em 1em 0;
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: center;
+      justify-content: center;
+      width:150px;
+      height:150px;
+      overflow: hidden;
+      position:relative;
+      border:1px solid #d9e1e8;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container:hover .hover-container{
+      height: 30px;
+      transition: var(--media-manager-info-transition, all 0.15s linear);
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container:hover .hover-container *{
+      opacity:1;
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container .hover-container{
+      background-color: rgba(22,45,61,.7);
+      bottom: 0;
+      height: 0;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items: center;
+      align-items: center;
+      color:rgba(255,255,255,.7);
+      display: -webkit-flex;
+      display: flex;
+      transition: var(--media-manager-info-transition, all 0.15s linear);
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container .hover-container *{
+      transition: var(--media-manager-info-transition, all 0.15s linear);
+      opacity:0;
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container .hover-container *:hover{
+      color:rgba(255,255,255,1);
+      transition: var(--media-manager-info-transition, all 0.15s linear);
+      opacity:1
+    }
+
+
+    :host > section > .main-container > section  .flex-library .file-container:hover{
+      border:1px solid transparent;
+      cursor:pointer;
+      box-shadow: 0 0 1px 2px #4eb7f5;
+      transition: var(--media-manager-info-transition, all 0.15s linear);
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container[active]{
+      border:1px solid transparent;
+      cursor:pointer;
+      box-shadow: 0 0 0 3px #3899ec;
+      transition: var(--media-manager-transition, all 0.25s linear);
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container[active]:hover{
+      box-shadow: 0 0 0 3px #3899ec;
+    }
+
+    :host > section > .main-container > section  .flex-library .file-name{
+      font-size:12px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: center;
+      justify-content: center;
+      color:var(--media-manager-icon-color, #BDBDBD);
+      font-family:'robotomedium';
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container>.file-inner-container{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-align-items:center;
+      align-items: center;
+      width:100%;
+      height:100%;
+    }
+
+    :host > section > .main-container > section  .flex-library .file-container>.file-inner-container>.file-nested-inner-container{
+      max-height:100%;
+    }
+
+    :host > section > .main-container > section .library-container-header{
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      -webkit-align-items:center;
+      align-items: center;
+      width:100%;
+      height:100%;
+      margin-bottom:1em;
+    }
+
+    :host > footer {
+      border-top: var(--galery-editor-border, 1px solid #e2e2e2);
+      min-height: 60px;
+      width: 100%;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      padding: 0 2em;
+    }
+
+    @media (max-width: 1024px) {
+      :host {
+        width: 98%;
+        left: 1%;
+        right: 1%;
+        top: 2%;
+        height: 90%;
+      }
+
+      :host > section > div {
+        width: 65%;
+      }
+
+      :host > section > aside {
+        width: 35%;
+      }
+
+      :host h4{
+        font-size: 1.3em;
+      }
+    }
+    @media (max-width: 640px) {
+      :host>header{
+        padding: 0 .25em;
+      }
+      :host>header>h6{
+        display:none;
+      }
+      :host>header>.search{
+        margin-right:1em;
+      }
+      :host > section {
+        -webkit-flex-wrap: wrap;
+        flex-wrap:wrap;
+        overflow-y:scroll;
+      }
+      :host > section >*{
+        width:100% !important;
+      }
+      :host > section > aside .camera-container{
+        display:none;
+      }
+      :host .paper-button-0 {
+        padding: 0.5em 0.37em;
+      }
+      :host .hide-touch{
+        display:none;
+      }
+      :host h4{
+        font-size: 1.1em;
+      }
+      :host > section > aside header {
+        border-top: var(--galery-editor-border, 1px solid #e2e2e2);
+      }
+    }
+  </style>
+  <template>
+    <header>
+      <h6>[[mainTitle]]</h6>
+      <div class="search">
+        <ui-input-addon icon-class="icon-search" id="searchInput" handle-event="true"></ui-input-addon>
+      </div>
+      <div>
+        <div class="icon-container">
+          <iron-icon icon="device:storage" class="active" id="library" on-tap="_onLibraryClick"></iron-icon>
+          <paper-tooltip offset="0">Library</paper-tooltip>
+        </div>
+         <div class="icon-container">
+           <iron-icon icon="folder-open" id="recent" on-tap="_onRecentClick"></iron-icon>
+           <paper-tooltip offset="0">Recently Added</paper-tooltip>
+         </div>
+        <div class="icon-container">
+          <iron-icon icon="editor:attach-file" class="inactive" id="attach" on-tap="_onAttachClick"></iron-icon>
+          <paper-tooltip offset="0">Selected</paper-tooltip>
+        </div>
+
+        <div class="icon-container">
+          <iron-icon icon="close" on-tap="_onCloseClick"></iron-icon>
+          <paper-tooltip offset="0">Close</paper-tooltip>
+        </div>
+      </div>
+    </header>
+    <section>
+      <div class="main-container">
+        <header>
+          <div class="label-total flex-container align-center">
+            <iron-icon icon="image:photo-library"></iron-icon>
+            <div class="size-14 margin-left half"><span id="queryFilesCount"></span> <span id="queryFiles">files</span></div>
+            <div class="size-14 margin-left hide-touch"><span class="secondary-color">Mode: </span><span id="mode"></span></div>
+          </div>
+
+          <div>
+            <paper-button raised class="file-add" id="filesAdd" on-tap="_onAddFiles">
+              <iron-icon icon="file-upload"></iron-icon>
+              [[addFilesLabel]]
+            </paper-button>
+            <span class="icon-arrow-back swipe" id="backArrow" on-tap="_onBackClick"></span>
+          </div>
+
+        </header>
+        <section id="containerSection">
+
+          <div id="libraryContainer">
+            <div class="library-container-header">
+              <h4 class="accent-color">Media Library Files</h4>
+              <div class="flex-container align-center">
+                <div>
+                  <iron-icon icon="refresh" class="icon margin-right" id="refresh" on-tap="_onRefresh"></iron-icon>
+                  <paper-tooltip offset="0">Refresh</paper-tooltip>
+                </div>
+                <div class="flex-container align-center">
+                  <iron-icon icon="arrow-back" class="icon nav margin-right half hidden" id="arrowPrev" on-tap="_onPrev"></iron-icon>
+                  <iron-icon icon="arrow-forward" class="icon nav large-margin-right hidden" id="arrowNext" on-tap="_onNext"></iron-icon>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-library">
+              <template is="dom-repeat" items="[[files]]" as="file">
+               <div class="file-outer-container">
+                 <div class="file-container" library-file data-id$="[[file.id]]" active$="[[file.active]]">
+                  <div class="file-inner-container">
+                    <div class="file-nested-inner-container">
+                      <img src="[[_getUrl(file)]]">
+                    </div>
+                  </div>
+                   <div class="hover-container">
+                     <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onLibraryClipboard"></iron-icon>
+                     <iron-icon icon="delete" data-id$="[[file.id]]" on-tap="_onLibraryDelete"></iron-icon>
+                   </div>
+                 </div>
+                 <div class="file-name">[[file.id]]</div>
+               </div>
+              </template>
+              <div id="filesMessage" class="hide">No files available...</div>
+            </div>
+          </div>
+
+          <div id="recentContainer" class="hide">
+            <div class="library-container-header">
+              <h4 class="accent-color">Recently Added Files</h4>
+            </div>
+            <div class="flex-library">
+              <template is="dom-repeat" items="[[recentFiles]]" as="file">
+                <div class="file-outer-container">
+                  <div class="file-container" recent-file data-id$="[[file.id]]" active$="[[file.active]]">
+                    <div class="file-inner-container">
+                      <div class="file-nested-inner-container">
+                        <img src="[[_getUrl(file)]]">
+                      </div>
+                    </div>
+                    <div class="hover-container">
+                      <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onRecentClipboard"></iron-icon>
+                      <iron-icon icon="delete" data-id$="[[file.id]]" on-tap="_onLibraryDelete"></iron-icon>
+                    </div>
+                  </div>
+                  <div class="file-name">[[file.id]]</div>
+                </div>
+              </template>
+              <div id="recentFilesMessage">No recent files have been added...</div>
+            </div>
+          </div>
+
+          <div id="attachContainer" class="hide">
+            <div class="library-container-header">
+              <h4 class="accent-color">Selected Files</h4>
+            </div>
+            <div class="flex-library" id="multiSelect">
+              <template is="dom-repeat" items="[[selectedFiles]]" as="file">
+                <div class="file-outer-container" data-sortable>
+                  <div class="file-container" selected-file data-id$="[[file.id]]" active$="[[file.active]]" data-selected-file>
+                    <div class="file-inner-container">
+                      <div class="file-nested-inner-container">
+                        <img src="[[_getUrl(file)]]">
+                      </div>
+                    </div>
+                    <div class="hover-container">
+                      <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onSelectedClipboard"></iron-icon>
+                      <iron-icon icon="remove" data-id$="[[file.id]]" on-tap="_onSelectedRemove"></iron-icon>
+                    </div>
+                  </div>
+                  <div class="file-name">[[file.id]]</div>
+                </div>
+              </template>
+              <div id="selectedFilesMessage">No files have been selected...</div>
+            </div>
+          </div>
+
+          <div class="upload-container hide" id="uploadContainer">
+            <h4>File Upload</h4>
+            <p>
+              Select or drag files to add to your media gallery
+            </p>
+            <md-upload id="mediaManagerUpload" service="[[service]]"></md-upload>
+          </div>
+
+        </section>
+      </div>
+      <aside id="aside">
+        <div class="camera-container" id="cameraContainer">
+          <iron-icon icon="image:camera-alt"></iron-icon>
+          <div class="camera-file-container hide" id="cameraFileContainer">
+            <div class="camera-file-inner-container">
+              <div class="camera-nested-inner-container">
+                <img id="cameraImage">
+              </div>
+            </div>
+            <div class="info-container">
+              <span class="icon-name"></span>
+            </div>
+          </div>
+        </div>
+        <header>
+          <h6 id="imageInfo">File Info</h6>
+        </header>
+         <section>
+           <div scrollable>
+             <md-input label="Title" data-id="title" readonly="true" class="hidden" id="imageTitle" value$="{{selectedFile.title}}"></md-input>
+             <div class="link-box hidden" id="linkBox">
+               <md-input label="Link" data-id="link" readonly="true" id="imageLink" value$="{{selectedFile.link}}"></md-input>
+               <span class="icon-link link inactive" id="pasteLink" on-tap="_onPaste"></span>
+             </div>
+             <div class="target-box hidden" id="targetBox">
+               <span>New Target</span>
+               <md-checkbox attribute-listener="true" data-id="newTarget" id="target" disabled="true" checked$="{{selectedFile.newTarget}}"></md-checkbox>
+             </div>
+             <md-input label="Width" data-id="width" readonly="true" class="hidden" id="imageWidth" value$="{{selectedFile.width}}"></md-input>
+           </div>
+         </section>
+      </aside>
+    </section>
+    <footer>
+      <paper-button id="cancelButton" on-tap="_onCancelClick">Cancel</paper-button>
+      <paper-button id="doneButton" on-tap="_onDoneClick">Done</paper-button>
+    </footer>
+  </template>
+</dom-module>
+<script>
+
+  /*
+   *  Library File Entity
+   *
+   *    File:{
+   *       id:<String>
+   *       idStamp:<String>
+   *       blob:<Blob>
+   *       url:<String>
+   *       dataUrl:<String>
+   *       size:<String>
+   *       total:<Number>
+   *       type:<String>
+   *       isImage:<Boolean>
+   *       title:<String>,
+   *       link:<String>,
+   *       width:<Number>,
+   *       active:<Boolean>
+   *       dataLink:<String>
+   *       newTarget:<Boolean>
+   *    }
+   *
+ */
+
+  Polymer({
+
+    is: 'media-manager',
+
+    behaviors: [Elliptical.ComponentBehavior, Elliptical.ModalBehavior, Elliptical.UtilsBehavior],
+
+    properties: {
+      service: {
+        type: Object,
+        value: 'File'
+      },
+
+      notifyService: {
+        type: Object,
+        value: 'Notify'
+      },
+
+      mainTitle: {
+        type: String,
+        value: 'Media Manager'
+      },
+
+      addFilesLabel: {
+        type: String,
+        value: 'Add Files'
+      },
+
+      files: {
+        type: Array,
+        notify: true,
+        value: function () {
+          return [];
+        }
+      },
+
+      recentFiles: {
+        type: Array,
+        notify: true,
+        value: function () {
+          return [];
+        }
+      },
+
+      selectedFiles: {
+        type: Array,
+        notify: true,
+        value: function () {
+          return [];
+        }
+      },
+
+      selectedFile: {
+        type: Object,
+        notify: true,
+        value:{},
+        observer: "_selectedFileChanged"
+      },
+
+      mode: {
+        type: String,
+        value: 'browse'
+      },
+
+      queryStringWidth: {
+        type: Number,
+        value: 0
+      },
+
+      pageSize: {
+        type: Number,
+        value: 36
+      },
+
+      loadingMessage:{
+        type:String,
+        value:'Loading...'
+      },
+
+      serviceInitDelay:{
+        type:Number,
+        value:1500
+      },
+
+      _currentContainerId: {
+        type: String,
+        value: 'libraryContainer'
+      },
+
+      _service: {
+        type: Object,
+        value: null
+      },
+
+      _notifyService: {
+        type: Object,
+        value: null
+      },
+
+      _currentPage: {
+        type: Number,
+        value: 1
+      },
+
+      _totalFiles: {
+        type: Number,
+        value: 0
+      },
+
+      _totalQueryFiles: {
+        type: Number,
+        value: 0
+      },
+
+      _onLoadFlag: {
+        type: Boolean,
+        value: true
+      },
+
+      _publishId: {
+        type: String,
+        value: null
+      },
+
+      _clipboard:{
+        type:Object,
+        value:null
+      }
+    },
+
+    listeners: {},
+
+    /**
+     *  Ready
+     */
+    ready: function () {
+      this._setUtils();
+      var showAsideInput = this._showAsideInput.bind(this);
+      var service=this._serviceLibraryFiles.bind(this);
+      this._events();
+      this._setService();
+      this._setNotificationService();
+      this._setAttachIconState();
+      showAsideInput();
+      var delay=this.serviceInitDelay;
+      setTimeout(function(){
+        service(1);
+      },delay);
+    },
+
+
+    /**
+     *   Events
+     */
+    _events: function () {
+      this._event(this.element, 'md-upload-complete', this._onFileAdded.bind(this));
+      var event = this._data.click;
+      if (this._device.touch) event = 'press';
+
+      this._event(this.element, event, '[library-file]', this._onLibraryFileClick.bind(this));
+      this._event(this.element, event, '[recent-file]', this._onLibraryFileClick.bind(this));
+      this._event(this.element, event, '[selected-file]', this._onSelectedFileClick.bind(this));
+      this._event($(document), 'media-manager-show', this._onShow.bind(this));
+      this._event(this.element, 'ui-input-addon-press', this._onSearch.bind(this));
+      this._event(this.element, 'md-input-change', this._onInputChange.bind(this));
+      this._event(this.element, 'md-checkbox-change', this._onCheckboxChange.bind(this));
+    },
+
+    /********************* EVENT HANDLERS *****************************************************************************/
+
+    /**
+     *  On add files handler
+     *  @param event {object}
+     */
+    _onAddFiles: function (event) {
+      var self = this;
+      this._setContainers();
+      setTimeout(function () {
+        self._setButtonState();
+      }, 250);
+    },
+
+
+    /**
+     *  On back arrow click
+     *  @param event {object}
+     */
+    _onBackClick: function (event) {
+      var self = this;
+      this._resetBackArrow();
+      setTimeout(function () {
+        self._resetButtonState();
+      }, 250);
+    },
+
+
+    /**
+     *  Library icon click handler
+     *  @param event {object}
+     */
+    _onLibraryClick: function (event) {
+      var id = 'libraryContainer';
+      this._currentContainerId = id;
+      this._toggleContainer(id);
+      this._resetIconActiveStates();
+      var library = this.$.library;
+      library.classList.add('active');
+    },
+
+
+    /**
+     *  Recently added icon click handler
+     *  @param event {object}
+     */
+    _onRecentClick: function (event) {
+      var id = 'recentContainer';
+      this._currentContainerId = id;
+      this._toggleContainer(id);
+      this._resetIconActiveStates();
+      var recent = this.$.recent;
+      recent.classList.add('active');
+    },
+
+
+    /**
+     *  Attached icon click handler
+     *  @param event {object}
+     */
+    _onAttachClick: function (event) {
+      var attach = this.$.attach;
+      if (attach.classList.contains('inactive')) return;
+      var id = 'attachContainer';
+      this._currentContainerId = id;
+      this._toggleContainer(id);
+      this._resetIconActiveStates();
+      attach.classList.add('active');
+    },
+
+
+    /**
+     *  Delete library file handler
+     *  @param event {object}
+     */
+    _onLibraryDelete: function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var self = this;
+      var target = event.target;
+      var id = target.dataset.id;
+      this._serviceDelete(id, function (err, data) {
+        if (err) self._showNotification(err.message);
+        else {
+          self._deleteFromFiles(id, 'files');
+          self._deleteFromFiles(id, 'recentFiles');
+          self._deleteFromSelectedFiles(id);
+          self._updateTextAfterLibraryFileDelete();
+        }
+      });
+    },
+
+
+    /**
+     *  Remove from selected files handler
+     *  @param event {object}
+     */
+    _onSelectedRemove: function (event) {
+      var target = event.target;
+      var id = target.dataset.id;
+      this._deleteFromSelectedFiles(id);
+    },
+
+
+    /**
+     *  On cancel click handler
+     *  @param event {object}
+     */
+    _onCancelClick: function (event) {
+      this._hide();
+    },
+
+
+    /**
+     *  On close click handler
+     *  @param event {object}
+     */
+    _onCloseClick: function (event) {
+      this._hide();
+    },
+
+
+    /**
+     *  On done click handler
+     *  @param event {object}
+     */
+    _onDoneClick: function (event) {
+      var mode=this.mode;
+      if(mode!=='browse') this._sendAttachedFiles();
+      this._hide();
+    },
+
+
+    /**
+     *  On uploaded file handler
+     *  @param event {object}
+     */
+    _onFileAdded: function (event) {
+      var file = event.detail.file;
+      this.push('files', file);
+      this._totalFiles = this._totalFiles + 1;
+      this._addToRecentFiles(file);
+      this._updateFileTextAfterUpload();
+    },
+
+
+    /**
+     *  On library delegated press handler
+     *  @param event {object}
+     */
+    _onLibraryFileClick: function (event) {
+      var mode = this.mode;
+      var actualTarget = event.target;
+      if (actualTarget.tagName === 'IRON-ICON') return;
+      var target = event.currentTarget;
+      var id = target.dataset.id;
+      if (mode === 'multi-select') this._onLibraryMultiSelectFileClick(id, target);
+      else if(mode==='select') this._onLibrarySelectFileClick(id,target);
+      else this._onLibraryBrowseFileClick(id,target);
+    },
+
+
+    /**
+     *  Library click handler for browse mode
+     *  @param id {string}
+     *  @param target {object}
+     */
+    _onLibraryBrowseFileClick:function(id,target){
+      var entity = this._getSelectedEntity(id);
+      this._resetCameraContainer();
+      if (entity.active) {
+        entity.active=false;
+        this._resetSelectedFile();
+        this._notifyActiveState('files', entity);
+        this._notifyActiveState('recentFiles', entity);
+      } else {
+        entity.active=true;
+        this._resetSelectedFile();
+        this._setSelectedFile(entity);
+        this._notifyActiveState('files', entity);
+        this._notifyActiveState('recentFiles', entity);
+
+        this._setCameraContainerActive(entity);
+      }
+    },
+
+
+    /**
+     *  Library click handler for select mode
+     *  @param id {string}
+     *  @param target {object}
+     */
+    _onLibrarySelectFileClick:function(id,target){
+      var entity = this._getSelectedEntity(id);
+      this._resetCameraContainerActive();
+      if (entity.active) {
+        entity.active=false;
+        this._resetSelectedFiles();
+        this._notifyActiveState('files', entity);
+        this._notifyActiveState('recentFiles', entity);
+      } else {
+        this._resetSelectedFiles();
+        entity.active=true;
+        this._notifyActiveState('files', entity);
+        this._notifyActiveState('recentFiles', entity);
+        this._setSelectedFile(entity);
+        this._setCameraContainerActive(entity);
+      }
+    },
+
+
+    /**
+     *  On library delegated press handler for multi-select mode
+     *  @param id {string}
+     *  @param target {object}
+     */
+    _onLibraryMultiSelectFileClick: function (id, target) {
+      var entity = this._getSelectedEntity(id);
+      if (!entity.active) {
+        entity.active = true;
+        this._notifyActiveState('files', entity);
+        this._notifyActiveState('recentFiles', entity);
+      }
+      this._setSelectedFile(entity);
+      this._setCameraContainerActive(entity);
+    },
+
+
+    /**
+     *  On selected file click delegated press handler
+     *  @param event {object}
+     */
+    _onSelectedFileClick: function (event) {
+      var mode = this.mode;
+      var actualTarget = event.target;
+      if (actualTarget.tagName === 'IRON-ICON') return;
+      var target = event.currentTarget;
+      var id = target.dataset.id;
+      if (mode !== 'browse') {
+        var entity = this._getSelectedEntityFromSelectedFiles(id);
+        this._setSelectedFile(entity);
+        this._setCameraSelectedImageUrl(entity);
+      }
+    },
+
+
+    /**
+     *  On show event handler
+     *  @param event {object}
+     */
+    _onShow: function (event) {
+      var detail=event.detail;
+      this._show(detail);
+    },
+
+
+    /**
+     *  On search handler
+     *  @param event {object}
+     */
+    _onSearch: function (event) {
+      var term = event.detail.value;
+      if (term.length > 0)this._serviceSearchFiles(1, term);
+      else this._serviceLibraryFiles(1);
+    },
+
+
+    /**
+     *  On refresh click handler
+     */
+    _onRefresh: function () {
+      this.$.searchInput.value = '';
+      this._serviceLibraryFiles(1);
+    },
+
+
+    /**
+     *  On Next page handler
+     *  @param event {object}
+     */
+    _onNext: function (event) {
+      var page = this._currentPage;
+      page += 1;
+      this._serviceLibraryFiles(page);
+    },
+
+
+    /**
+     *  On Prev page handler
+     *  @param event {object}
+     */
+    _onPrev: function (event) {
+      var page = this._currentPage;
+      page -= 1;
+      if (page < 1) page = 1;
+      this._serviceLibraryFiles(page);
+    },
+
+
+    /**
+     *  MD-INPUT change handler
+     */
+    _onInputChange: function (event) {
+      if (this.mode === 'browse') return;
+      var detail = event.detail;
+      var file = this.selectedFile;
+      file[detail.id] = detail.value;
+      this.selectedFile = {};
+      this.selectedFile = file;
+    },
+
+    /**
+     *  MD-INPUT change handler
+     */
+    _onCheckboxChange: function (event) {
+      if (this.mode === 'browse') return;
+      var detail = event.detail;
+      if(detail.id!=='newTarget') return;
+      var file = this.selectedFile;
+      file.newTarget = detail.checked;
+      this.selectedFile = file;
+    },
+
+
+    /**
+     *   Library files copy to clipboard handler
+     */
+    _onLibraryClipboard:function(event){
+      this._setClipboard(event.target,'files');
+    },
+
+
+    /**
+     *   Recently added files copy to clipboard handler
+     */
+    _onRecentClipboard:function(event){
+      this._setClipboard(event.target,'recentFiles');
+    },
+
+
+    /**
+     *   Selected files copy to clipboard handler
+     */
+    _onSelectedClipboard:function(event){
+      this._setClipboard(event.target,'selectedFiles');
+    },
+
+
+    /**
+     *  On clipboard paste handler
+     */
+    _onPaste:function(event){
+      var target=event.target;
+      if(target.classList.contains('inactive')) return;
+      var clipboard=this._clipboard;
+      if(!clipboard) return;
+      var file=this.selectedFile;
+      file.link=clipboard.link;
+      file.dataLink=clipboard.dataLink;
+      this.selectedFile = {};
+      this.selectedFile = file;
+      this._resetClipboard();
+    },
+
+    /***************************** PRIVATE METHODS ********************************************************************/
+
+
+    /**
+     *  Show component
+     *  @param params {object}
+     */
+    _show: function (params) {
+      if (!params) params = {};
+      var mode = params.mode;
+      if (!mode) this.mode = 'browse';
+      else this.mode = mode;
+      if(params.id) this._setPublishId(params.id);
+      this.$.mode.innerText = mode;
+      this._renderModal();
+      this._setAttachIconState();
+      this.classList.remove('hide');
+      if(params.files && mode!=='browse'){
+        this.selectedFiles=[];
+        this.selectedFiles=params.files;
+        var file=params.files[0];
+        this.selectedFile=file;
+        this._notifySelectedFiles(params.files);
+        this._setCameraContainerActive(file);
+      }
+      if(mode==='multi-select') this._setSortable();
+    },
+
+
+    /**
+     *   Show aside camera input
+     */
+    _showAsideInput: function () {
+      this.$.imageTitle.classList.remove('hidden');
+      this.$.linkBox.classList.remove('hidden');
+      this.$.imageWidth.classList.remove('hidden');
+      this.$.targetBox.classList.remove('hidden');
+    },
+
+
+    /**
+     *   Show notification
+     *   @param msg {string}
+     */
+    _showNotification: function (msg) {
+      var notify = this._notifyService;
+      notify.show(msg);
+    },
+
+    /**
+     *   Show notification delay
+     */
+    _showNotificationDelay: function () {
+      if(this._onLoadFlag) return;
+      var notify = this._notifyService;
+      var msg=this.loadingMessage;
+      if(notify.showOnDelay) notify.showOnDelay(msg);
+    },
+
+
+
+    /**
+     *   Hide component
+     */
+    _hide: function () {
+      this._deleteModal();
+      this.classList.add('hide');
+      this._fireEvent('hide', {});
+      this.$.mediaManagerUpload.clear();
+      this._resetComponentState();
+    },
+
+
+    /**
+     *  Hide all containers
+     */
+    _hideAllContainers: function () {
+      this.$.uploadContainer.classList.add('hide');
+      this.$.libraryContainer.classList.add('hide');
+      this.$.recentContainer.classList.add('hide');
+      this.$.attachContainer.classList.add('hide');
+    },
+
+
+    /**
+     *   Hide notification delay
+     */
+    _hideNotificationDelay: function () {
+      if(this._onLoadFlag) this._onLoadFlag=false;
+      else{
+        var notify = this._notifyService;
+        if(notify.hideOnDelay) notify.hideOnDelay();
+      }
+    },
+
+
+    /**
+     *   Bind library media files to service
+     *   @param page {number}
+     */
+    _serviceLibraryFiles: function (page) {
+      var self = this;
+      var pageSize = this.pageSize;
+      this._totalQueryFiles = 0;
+      var Service = this._service;
+      var service = new Service();
+      this._showNotificationDelay();
+      service.paginate({
+        baseUrl: '', rawUrl: '', page: page, pageSize: pageSize
+      })
+              .get({}, function (err, result) {
+                self._hideNotificationDelay();
+                self.files = result.data;
+                self._setActiveFilesAsync();
+                self._totalFiles = result.pagination.count;
+                self._setPaginationData(result.pagination);
+                self._setLibraryFilesMessage();
+              });
+    },
+
+
+    /**
+     *   Bind library media files to service
+     *   @param page {number}
+     *   @param term {string}
+     */
+    _serviceSearchFiles: function (page, term) {
+      var self = this;
+      var pageSize = this.pageSize;
+      this._currentPage = page;
+      var Service = this._service;
+      var service = new Service();
+      this._showNotificationDelay();
+      service.paginate({
+        baseUrl: '', rawUrl: '', page: page, pageSize: pageSize
+      })
+              .filter({id:term})
+              .get({}, function (err, result) {
+                self._hideNotificationDelay();
+                self.files = result.data;
+                self._setActiveFilesAsync();
+                self._totalQueryFiles = result.pagination.count;
+                self._setPaginationData(result.pagination);
+                self._setLibraryFilesMessage();
+              });
+    },
+
+
+    /**
+     *  Delete service call
+     *  @param id {string}
+     *  @param callback {function}
+     */
+    _serviceDelete: function (id, callback) {
+      var Service = this._service;
+      Service.delete({id:id}, callback);
+    },
+
+
+    /**
+     *  Send selected event with attached files
+     *
+     */
+    _sendAttachedFiles:function(){
+      var mode=this.mode;
+      var data={};
+      data.id=this._publishId;
+      if(mode==='select') data.files=this.selectedFiles;
+      else data.files=this._getSortedSelectedFiles();
+      if(data.files.length >0){
+        this.fire('media-manager-selected',data);
+        this._showNotification('Selected media files attached');
+      }
+    },
+
+
+    /**
+     *  selectedFiles changed observable handler
+     *  @param newValue {object}
+     *  @param oldValue {object}
+     */
+    _selectedFileChanged: function (newValue, oldValue) {
+      var mode = this.mode;
+      if (mode === 'browse') return;
+      if (!newValue.id) return;
+      var selectedFiles = this.selectedFiles;
+      if (mode === 'select') this._setSelectedFilesSingleMode(newValue, selectedFiles);
+      else if (mode === 'multi-select') this._setSelectedFilesMultiMode(newValue, selectedFiles);
+    },
+
+
+    /**
+     *  Notify active state change for array entity
+     *  @param arrName {string}
+     *  @param entity {object}
+     */
+    _notifyActiveState: function (arrName, entity) {
+      var index = this[arrName].indexOf(entity);
+      this.notifyPath(arrName + '.' + index + '.active', entity.active);
+    },
+
+
+    /**
+     *  Notify array entity inactive state
+     *  @param id {string}
+     *  @param arrName {string}
+     */
+    _notifyInactive: function (id, arrName) {
+      var array = this._utils.array;
+      var entity = array.findById(this[arrName], id);
+      var index = this[arrName].indexOf(entity);
+      if(entity){
+        entity.active=false;
+        this.notifyPath(arrName + '.' + index + '.active', false);
+      }
+    },
+
+
+    _notifySelectedFiles:function(files){
+      var self=this;
+      files.forEach(function(file){
+        self._notifySelectedFile(file);
+      });
+    },
+
+
+    /**
+     *  Updated library file with selectedFiles entity props
+     *  @param file {object}
+     */
+    _notifySelectedFile(file){
+      var files = this.files;
+      var array = this._utils.array;
+      var entity = array.findById(files, file.id);
+      var index = files.indexOf(entity);
+      if(entity){
+        entity.active=true;
+        entity.title=file.title;
+        entity.link=file.link;
+        entity.width=file.width;
+        entity.dataLink=file.dataLink;
+        if(!entity.newTarget) entity.newTarget=false;
+        this.notifyPath('files.' + index + '.active', true);
+        this.notifyPath('files.' + index + '.title', file.title);
+        this.notifyPath('files.' + index + '.link', file.link);
+        this.notifyPath('files.' + index + '.width', file.width);
+        this.notifyPath('files.' + index + '.newTarget', file.newTarget);
+      }
+    },
+
+
+    /**
+     *  Toggle container visibility by id
+     *  @param containerId {string}
+     */
+    _toggleContainer: function (containerId) {
+      this._hideAllContainers();
+      this._setFilesMessages();
+      this._updateFilesCountText(containerId);
+      var showContainer = this.$[containerId];
+      showContainer.classList.remove('hide');
+    },
+
+
+    /**
+     *   Add file to recently added files
+     *   @param file {object}
+     */
+    _addToRecentFiles: function (file) {
+      this.push('recentFiles', file);
+    },
+
+
+    /**
+     *   Update text count label after library file deleted
+     */
+    _updateTextAfterLibraryFileDelete: function () {
+      var total;
+      var id = this._currentContainerId;
+      if (id === 'recentContainer') {
+        total = this.recentFiles.length;
+      } else {
+        total = this._totalFiles;
+        total -= 1;
+        this._totalFiles = total;
+      }
+      this._setFilesCountText(total);
+    },
+
+
+    /**
+     *  Update files text labels
+     *  @param containerId {string}
+     */
+    _updateFilesCountText(containerId){
+      var count;
+      switch (containerId) {
+        case 'recentContainer':
+          count = this.recentFiles.length;
+          this._setFilesCountText(count);
+          break;
+
+        case 'attachContainer':
+          count = this.selectedFiles.length;
+          this._setFilesCountText(count);
+          break;
+
+        case 'libraryContainer':
+          if (this._totalQueryFiles) count = this._totalQueryFiles;
+          else count = this._totalFiles;
+          this._setFilesCountText(count);
+          break;
+      }
+    },
+
+
+    /**
+     *   Update file text after upload
+     */
+    _updateFileTextAfterUpload: function () {
+      var count;
+      var id = this._currentContainerId;
+      if (id === 'recentContainer') {
+        count = this.recentFiles.length;
+        this._setFilesCountText(count);
+      } else if (id === 'libraryContainer') {
+        if (!this._totalQueryFiles) {
+          count = this._totalFiles;
+          this._setFilesCountText(count);
+        }
+      }
+    },
+
+
+    /**
+     *  Destroy sortable plugin
+     */
+    _destroySortable:function(){
+      var $multiSelect=$(this.$.multiSelect);
+      $multiSelect.sortable('destroy');
+    },
+
+
+    /**
+     *  Delete from files array arrName
+     *  @param id {string}
+     *  @param arrName {string}
+     */
+    _deleteFromFiles: function (id, arrName) {
+      var array = this._utils.array;
+      var entity = array.findById(this[arrName], id);
+      if (entity) {
+        entity.active = false;
+        var index = this[arrName].indexOf(entity);
+        this.splice(arrName, index, 1);
+      }
+    },
+
+
+    /**
+     *  Remove from selected files
+     *  @param id {string}
+     */
+    _deleteFromSelectedFiles: function (id) {
+      var array = this._utils.array;
+      var entity = array.findById(this.selectedFiles, id);
+      if (entity) {
+        entity.active = false;
+        var index = this.selectedFiles.indexOf(entity);
+        this.splice('selectedFiles', index, 1);
+      }
+      this._notifyInactive(id, 'files');
+      this._notifyInactive(id, 'recentFiles');
+      this._resetCameraContainerActive();
+    },
+
+
+    /**
+     *  Get image url formatted by width querystring, if set
+     *  @param url {string}
+     */
+    _getWidthFormattedImageUrl:function(url){
+      var width=this.queryStringWidth;
+      if(width>0){
+        if(url.indexOf('?') > -1) url+='&width=' + width;
+        else url+='?width=' + width;
+        return url;
+      }else return url;
+    },
+
+
+    /**
+     *   Return the available file url property, modified with querystring width, if set and applicable
+     *   @param item {object}
+     *   @returns {string}
+     */
+    _getUrl: function (item) {
+      var type = this._getFileType(item);
+      if (type === 'image') return (item.url) ? this._getWidthFormattedImageUrl(item.url) : item.dataUrl;
+      else if (type === 'pdf') return this._getPdfDocUrl();
+      else return this._getDocUrl();
+    },
+
+    /**
+     *   Return the available file url property
+     *   @param item {object}
+     *   @returns {string}
+     */
+    _getFileUrl: function (item) {
+      return (item.url) ? item.url : item.dataUrl;
+    },
+
+
+    /**
+     *  Get entity from array
+     *  @param id {string}
+     *  @param arrName {string}
+     *  @returns {object}
+     */
+    _getEntity:function(id,arrName){
+      var array = this._utils.array;
+      return array.findById(this[arrName], id);
+    },
+
+
+    /**
+     *  Get clipboard active status
+     *  @returns {boolean}
+     *
+     */
+    _getClipboardStatus:function(){
+      var mode=this.mode;
+      if(mode==='browse') return false;
+      return (this.selectedFiles.length > 0);
+    },
+
+
+    /**
+     *  Get file type
+     *  @param file {object}
+     *  @returns {string}
+     */
+    _getFileType: function (file) {
+      if (file.isImage) return 'image';
+      else {
+        if (file.id.indexOf('.pdf') > -1) {
+          return 'pdf';
+        } else return 'doc';
+      }
+    },
+
+
+    /**
+     *  Get selected entity from file arrays
+     *  @param id {string}
+     *  @returns {object}
+     */
+    _getSelectedEntity: function (id) {
+      var array = this._utils.array;
+      var entity = array.findById(this.files, id);
+      if (!entity) entity = this._getSelectedEntityFromSelectedFiles(id);
+      return entity;
+    },
+
+
+    /**
+     *  Get selected entity from selectedFiles array by id
+     *  @returns {object}
+     */
+    _getSelectedEntityFromSelectedFiles: function (id) {
+      var array = this._utils.array;
+      return array.findById(this.selectedFiles, id);
+    },
+
+
+    /**
+     *  Get the sorted file selections
+     *  @returns {Array}
+     */
+    _getSortedSelectedFiles:function(){
+      var self=this;
+      var sorted=[];
+      var $multiSelect=$(this.$.multiSelect);
+      var files=$multiSelect.find('[data-selected-file]');
+      if(files.length===0) return sorted;
+      $.each(files,function(index,element){
+        var id=element.dataset.id;
+        var entity=self._getSelectedEntityFromSelectedFiles(id);
+        if(entity) sorted.push(entity);
+      });
+
+      return sorted;
+    },
+
+
+    /**
+     *  Set clipboard
+     *  @param target {object}
+     *  @param arrName {string}
+     */
+    _setClipboard:function(target,arrName){
+      if(!this._getClipboardStatus()) return;
+      var id=target.dataset.id;
+      var entity=this._getEntity(id,arrName);
+      if(!entity) return;
+      this._clipboard={};
+      var url=this._getFileUrl(entity);
+      if(url.indexOf('data:') > -1){
+        this._clipboard.link='data:link';
+        this._clipboard.dataLink=url;
+      }else{
+        this._clipboard.link=url;
+        this._clipboard.dataLink=null;
+      }
+      this.$.pasteLink.classList.remove('inactive');
+      this._showNotification('Url added to clipboard');
+    },
+
+
+    /**
+     *  Set sortable behavior for multi selected items
+     */
+    _setSortable:function(){
+      var $multiSelect=$(this.$.multiSelect);
+      $multiSelect.sortable({
+        cursor: "move",
+        items: "> [data-sortable]",
+        tolerance: "pointer"
+      });
+    },
+
+
+    /**
+     *  Set the selectedFile observale to a file entity
+     *  @param entity {object}
+     */
+    _setSelectedFile: function (entity) {
+      this.selectedFile = {};
+      this.selectedFile = entity;
+    },
+
+
+    /**
+     *  Updated selectedFiles in single mode
+     *  @param obj {object}
+     *  @param selectedFiles {array}
+     */
+    _setSelectedFilesSingleMode: function (obj, selectedFiles) {
+      if (selectedFiles.length === 0) {
+        this.push('selectedFiles', obj)
+      } else {
+        var entity = selectedFiles[0];
+        if (entity.id === obj.id) {
+          entity.title = obj.title;
+          entity.link = obj.link;
+          entity.width = obj.width;
+          entity.dataLink=obj.dataLink;
+          if(!entity.newTarget) entity.newTarget=false;
+        } else {
+          if(obj.newTarget===undefined) obj.newTarget=false;
+          this.splice('selectedFiles', 0, 1);
+          this.push('selectedFiles', obj);
+        }
+      }
+    },
+
+
+    /**
+     *  Updated selectedFiles in multi mode
+     *  @param obj {object}
+     *  @param selectedFiles {array}
+     */
+    _setSelectedFilesMultiMode: function (obj, selectedFiles) {
+      var array = this._utils.array;
+      var entity = array.findById(selectedFiles, obj.id);
+      if (entity) {
+        entity.title = obj.title;
+        entity.link = obj.link;
+        entity.width = obj.width;
+        entity.dataLink=obj.dataLink;
+        if(!entity.newTarget) entity.newTarget=false;
+      } else {
+        if(obj.newTarget===undefined) obj.newTarget=false;
+        this.push('selectedFiles', obj);
+      }
+    },
+
+
+    /**
+     *  Async delay iterate selectedFiles array and notify files,,recentFiles contained selectedFiles entities
+     */
+    _setActiveFilesAsync: function () {
+      var self = this;
+      var selectedFiles = this.selectedFiles;
+      setTimeout(function () {
+        selectedFiles.forEach(function (obj) {
+          self._notifySelectedFile(obj);
+        });
+      }, 250);
+    },
+
+
+    /**
+     *  Set the camera selected image url
+     */
+    _setCameraSelectedImageUrl: function (file) {
+      var url = this._getUrl(file);
+      this.$.cameraImage.setAttribute('src', url);
+    },
+
+
+    /**
+     *   Set service
+     */
+    _setService: function () {
+      this._service = this.$service(this.service);
+    },
+
+
+    /**
+     *   Set notification service
+     */
+    _setNotificationService: function () {
+      var notifyServiceName = this.notifyService;
+      var Notify = this.$service(notifyServiceName);
+      this._notifyService = new Notify();
+    },
+
+
+    /**
+     *  Set broadcast id
+     *  @param id {string}
+     *
+     */
+    _setPublishId: function (id) {
+      this._publishId = id;
+    },
+
+
+    /**
+     *  Set pageination UI
+     *  @param obj {object}
+     */
+    _setPaginationData: function (obj) {
+      var count = obj.count;
+      this._setFilesCountText(count);
+      var page = obj.page;
+      var pageCount = obj.pageCount;
+      if (page > 1) this.$.arrowPrev.classList.remove('hidden');
+      else this.$.arrowPrev.classList.add('hidden');
+      if (pageCount > page) this.$.arrowNext.classList.remove('hidden');
+      else this.$.arrowNext.classList.add('hidden');
+    },
+
+
+    /**
+     *   Set files text labels
+     */
+    _setFilesCountText: function (count) {
+      this.$.queryFilesCount.innerText = count;
+      this.$.queryFiles = (count === 1) ? 'file' : 'files';
+    },
+
+
+    /**
+     *   Set containers visibility
+     */
+    _setContainers: function () {
+      var id = this._currentContainerId;
+      var activeContainer = this.$[id];
+      activeContainer.classList.add('hide');
+      this.$.uploadContainer.classList.remove('hide');
+    },
+
+
+    /**
+     *  Animate out button
+     */
+    _setButtonState: function () {
+      var filesAdd = this.$.filesAdd;
+      var backArrow = this.$.backArrow;
+      filesAdd.classList.add('fade');
+      backArrow.classList.remove('swipe');
+    },
+
+
+    /**
+     *   Set the camera aside to the active, selected library file
+     *   @param entity {object}
+     */
+    _setCameraContainerActive: function (entity) {
+      this.$.cameraContainer.classList.add('active');
+      var url = this._getUrl(entity);
+      this.$.cameraImage.setAttribute('src', url);
+      this.$.imageInfo.innerHTML = entity.id;
+      this.$.cameraFileContainer.classList.remove('hide');
+      var mode = this.mode;
+      if (mode !== 'browse') this._setInputWriteProperties();
+    },
+
+
+    /**
+     *  Remove inactive state from attach icon
+     */
+    _setAttachIconState: function () {
+      var mode = this.mode;
+      if (mode !== 'browse')this.$.attach.classList.remove('inactive');
+    },
+
+
+    /**
+     *  Make file attribute inputs writable
+     */
+    _setInputWriteProperties: function () {
+      this.$.imageTitle.setWritable();
+      this.$.imageLink.setWritable();
+      this.$.imageWidth.setWritable();
+      this.$.target.setEnabled();
+    },
+
+
+    /**
+     * Make file attribute inputs readonly
+     */
+    _setInputReadonlyProperties: function () {
+      this.$.imageTitle.setReadonly();
+      this.$.imageLink.setReadonly();
+      this.$.imageWidth.setReadonly();
+      this.$.target.setDisabled();
+    },
+
+
+    /**
+     *  set visibility of file messages
+     */
+    _setFilesMessages: function () {
+      this._setLibraryFilesMessage();
+      var recentFiles = this.recentFiles;
+      var selectedFiles = this.selectedFiles;
+      if (recentFiles.length < 1) this.$.recentFilesMessage.classList.remove('hide');
+      else this.$.recentFilesMessage.classList.add('hide');
+      if (selectedFiles.length < 1) this.$.selectedFilesMessage.classList.remove('hide');
+      else this.$.selectedFilesMessage.classList.add('hide');
+    },
+
+
+    /**
+     *  set library files message
+     */
+    _setLibraryFilesMessage: function () {
+      var files = this.files;
+      if (files.length < 1) this.$.filesMessage.classList.remove('hide');
+      else this.$.filesMessage.classList.add('hide');
+    },
+
+
+    /**
+     *  Restore active container from back arrow
+     */
+    _resetBackArrow: function () {
+      this.$.uploadContainer.classList.add('hide');
+      var id = this._currentContainerId;
+      var activeContainer = this.$[id];
+      this._setFilesMessages();
+      activeContainer.classList.remove('hide');
+    },
+
+
+    /**
+     *  Remove active state from all top icons
+     */
+    _resetIconActiveStates: function () {
+      var library = this.$.library;
+      library.classList.remove('active');
+      var recent = this.$.recent;
+      recent.classList.remove('active');
+      var attach = this.$.attach;
+      attach.classList.remove('active');
+    },
+
+
+    /**
+     *  Animate in button
+     */
+    _resetButtonState: function () {
+      var filesAdd = this.$.filesAdd;
+      var backArrow = this.$.backArrow;
+      backArrow.classList.add('swipe');
+      filesAdd.classList.remove('fade');
+    },
+
+
+    /**
+     *   Reset/clear camera aside data
+     */
+    _resetCameraContainerActive: function () {
+      this.selectedFile = {};
+      this.$.cameraContainer.classList.remove('active');
+      this.$.cameraImage.removeAttribute('src');
+      this.$.imageInfo.innerHTML = 'File Info';
+      this.$.cameraFileContainer.classList.add('hide');
+      this._setInputReadonlyProperties();
+    },
+
+
+     /**
+      *  Reset camera aside UI
+      */
+    _resetCameraContainer:function(){
+      this.$.cameraContainer.classList.remove('active');
+      this.$.cameraImage.removeAttribute('src');
+      this.$.imageInfo.innerHTML = 'File Info';
+      this.$.cameraFileContainer.classList.add('hide');
+    },
+
+
+    /**
+     *  Clear selectedFiles, if not multi-select mode
+     */
+    _resetSelectedFiles: function () {
+      var self=this;
+      var selectedFiles=this.selectedFiles;
+      selectedFiles.forEach(function(obj){
+        self._notifyInactive(obj.id, 'files');
+        self._notifyInactive(obj.id, 'recentFiles');
+      });
+      this.selectedFiles = [];
+    },
+
+
+    /**
+     *  Reset selectedFile
+     */
+    _resetSelectedFile: function () {
+      var id=this.selectedFile.id;
+      if(id){
+        this._notifyInactive(id, 'files');
+        this._notifyInactive(id, 'recentFiles');
+        this.selectedFile={};
+        this._resetCameraContainerActive();
+      }
+    },
+
+
+    /**
+     *  Reset the clipboard
+     */
+    _resetClipboard:function(){
+      this._clipboard=null;
+      this.$.pasteLink.classList.add('inactive');
+    },
+
+
+    /**
+     *  Reset the component state
+     */
+    _resetComponentState:function(){
+      var mode=this.mode;
+      if(mode==='browse') this._resetSelectedFile();
+      else{
+        this.selectedFile={};
+        this._resetSelectedFiles();
+      }
+      if(mode==='multi-select') this._destroySortable();
+      this._resetCameraContainerActive();
+      var containerId='libraryContainer';
+      this._currentContainerId=containerId;
+      this._toggleContainer(containerId);
+      this._resetButtonState();
+      this._resetClipboard();
+      this._publishId=null;
+    },
+
+
+    /**
+     *  Fire event:
+     *  @param evt {string}
+     *  @param data {object}
+     */
+    _fireEvent:function(evt,data){
+      this.fire('media-manager-' + evt,data);
+    },
+
+
+    /**
+     *  Default pdf placeholder image dataUrl
+     */
+    _getPdfDocUrl:function(){
+      return 'data:image/png;base64,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';
+    },
+
+    /**
+     *  Default general document placeholder image dataUrl
+     */
+    _getDocUrl:function(){
+      return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAIAAAD2HxkiAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAABV0RVh0Q3JlYXRpb24gVGltZQA4LzI5LzE23TDkswAADItJREFUeJzt3f9PG4Ufx/G1hWFwlU2YjOmY25TZ4RjyrafZfvELCZtREv1FY0z0FxMTf/TvMTH6i4kmOk0WTYzGmF5burIBa2Ewap1s1SJswFxHoZ8f+GSfRdp+SnvX11Gej5/Yrr17x/Xp0ev1zpXJZHYB0HGrBwB2OiIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQECNCQIwIATEiBMSIEBAjQkCMCAExIgTEiBAQI0JAjAgBMSIExIgQEKtTDwB7zczMRCKRa9eu3b592+12Nzc3P/3004ZhtLS0qEfDf7kymYx6Bljv7t27kUgkGAz+9ddfm5e63e4zZ84MDg663fwqpEeEtebGjRuBQODSpUv37t0r/sjOzs63336bDuWIsEZks9mxsTHTNJPJZOnPevnll1966SX7pkIpeE+47S0sLASDwZGRkZWVla0+96effurv73/kkUfsGAwlIsLtKpfLTU1NmaY5OTmZy+XKW0k2mw0Gg6+88oq1s2FLiHD7WVlZGRkZCQaDCwsLla8tHA6/+OKLHo+n8lWhPES4nSSTSdM0x8bGstmsVetcWlqamJjo6uqyaoXYKiLcBlZXV0dHR03TnJubs2P9pmkSoRAROlo6nTZNMxKJ3L17176tzM7OplKp1tZW+zaBIojQidbX12OxWCAQuHbtWtkHXbbENM3XX3+9ChvCZkToLEtLS6FQKBQK3b59u5rbjUajQ0NDu3fvruZGsYEInWJ2djYQCFy5cmVtba36W89kMhcvXjQMo/qbBhHqpdPpL7/8MpFIaMcwTZMIJYhQLJlMfvLJJ7YedylRKpWanZ09cuSIepAdh5N3lZaWlj799FMnFLjBNE31CDsRe0KlCxcu3D/h0+VynT592u/379u3b2FhwTTNX3/9tTqHRu+bmJhYXl7es2dPNTcK9oQyKysro6Oj9/84PDx89uzZ5ubmja/enjt37rXXXqvySGtra6FQqMobBRHKTE9Pr6+vb/x88ODBgYGBfz3AMIy2trYqTxUKhe5PheogQpl0On3/56eeeirvYwr9vX1u3boVj8ervNEdjghlHvw8sMrv/YoLBALqEXYWIpTxer33f56Zmcn7mKtXr1ZrnP+ZmZl5cC8NuxGhzIOfyM3NzQWDwX89IBAI3Lx5s7pD7dq1a1cul+OzimoiQpkDBw4cPHjw/h+//vrrb7/9Np1Or6+vp9Pp8+fPnz9/XjVbJBJZXV1VbX2n4UJPSuFw+KuvvlJPkd8bb7zR19ennmJHYE+o1N3d/dBDD6mnyI/DM1VDhEr19fU9PT3qKfKbm5v7/fff1VPsCEQo5uQvLrAzrA4iFNu/f/+xY8fUU+Q3NjZ2584d9RS1jwj1HLszzGazIyMj6ilqHxHqnThxwrHXwA4Gg446m6cmEaGe2+3efPa2Q/z9999TU1PqKWocETrCwMCAY++OxNkzdnPoP3wtKeWbQV6v98SJE1UYpgyTk5OWXG8fhRCh7WKxWCkPe/755+2epDycSmo3IrRXIpG4ceNGKY88evToY489Zvc85YlEIhbe/QL/QoT22tI+xO/32zdJJVZWVsbGxtRT1CwitNHy8vL4+Hjpj+/t7XXsNbD5jdQ+RGijcDi8pctpNzQ0dHd32zdPJZLJpE33hAIR2iWXy5Vx5TLHnj2zi52hbYjQLvF4fHFxcavPamtrO3z4sB3zVG50dNQ51ymuJURol7L3G47dGa6urkYiEfUUNYgIbTE/P/9/r9FU6KD/yZMnH374YRuGsoBpmpxKajkitEUp5z2Pj4/nfYzH4+nv77dnrkql0+lCF4ZD2YjQetlstpRf29Lp9PT0dN5Ffr/f5XJZPZc1ODxjOSK03qVLl0r8LmyhF/TevXuPHz9u6VCWicViVb6LcM0jQuuVvq+Ix+O3bt3Ku8ixh2fW19c3XyIVlSBCi12/fv369eslPrjIC7qjo+PRRx+1bi4rbfUkBBRHhBbb6lumQi9ol8vl2FNJl5aWJiYm1FPUDiK00p07dy5fvrylpxQ5v7Svr6+uzqF3ceXwjIWI0ErlXT2+0Au6sbGxq6ur4qFsMTs7m0ql1FPUCCK0TC6XK++IRSKRKPSCduzhmV3sDK1DhJa5evXq/Px8ec8t9II+dOjQ448/XsFQNopGo/fu3VNPUQuI0DKV7Bmi0WihO/M4dmeYyWSuXLminqIWEKE1FhcXJycny356JpOJRqN5F506dcqxN4357bff1CPUAiK0RigUKuWqakUU2pHW19f39vZWsmb7FDrTAFtChBZYW1sLh8MVriSVSiUSibyLDMNw5qmkjv0EZXshQgvEYrHl5eXK11NoZ9jS0uLMm8bs379fPUItIEILxONxS9YzPj5eKGZnHp5x7Fnm2wsRWiCdTluyniK/1vp8PqfdNKa9vb29vV09RS0gQgtYeGHcQgd4nHbTmLq6uuHhYfUUNYIILWDhPmpxcbHQL7cDAwMej8eqDVWirq7urbfeamtrUw9SI4jQAk8++aSFayt0eMYhN41pa2v74IMPnDBJzeAQswVOnTr1/fffW/UVu+np6fn5+ebm5s2LDMNQXY7e5XJ1dHQYhnH8+HFnfl6yfRGhBZqaml544YVffvnFkrVt3AXp3Llzmxdt3DTmzz//tGRDJWpsbOzr6/P7/Y79kvF2R4TWGBwcTCaTVp3GdfHixcHBwfr6+s2LDMP45ptvLNnK/3Xo0CHDMLq6uvhQ3la8J7RGXV3d+++/39nZacnainw5uKenx+6bxtTX1/f19X300UcffvhhT08PBdqN/76W2b179zvvvBOLxX7++efKd4mmaeY9ZbShoeG5556z6VJLLS0thmH09vY69pTxmkSEFvP5fD6f7+bNm6ZpFv/GXfE9zMYFo5544onNiwzDsDZCt9vt8/kMwzh27BgHXaqPCG1x4MCB4eHhoaGhaDTa0NCQ9zH79u0rvhLTNN988828Kz98+LAl7z+9Xm9/f//AwEBTU1Pla0N5iNBGDQ0NRc75PHr0qMvlKnK1/MuXL589e7axsXHzIsMwKozwyJEjhmF0dnY65ASAnYwIZbxeb2dnZ5Fb+W7cBenMmTObF508efLChQtlfJ1v4y2lYRitra1bfS5sQoRKQ0NDU1NTRd43BoPB06dPb36f5vF4Xn311c8//7z0bbW2thqGUYWDq9gqV6FLm6A64vH4Z599VuRsm/fee6+joyPvoh9++OHHH38svn6Px/Pss88ahmHtuXWwEBHqJRKJL774YmFhIe9Sn8/37rvvFnpuOBz+7rvv8v4jNjU1+f3+/v7+PXv2WDYrbECEjpDNZqPR6NjY2B9//PHPP/88eLTG7XZ//PHHe/fuLfTclZWVcDgci8VSqdTq6qrX621vb+/u7n7mmWfcbk7G2AaIEBDj/5SAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiBEhIEaEgBgRAmJECIgRISBGhIAYEQJiRAiIESEgRoSAGBECYkQIiP0HQgjIf9mLSIcAAAAASUVORK5CYII="';
+    },
+
+    /***************************** PUBLIC METHODS *********************************************************************/
+
+    /**
+     *   Show component
+     *   @param params {object}
+     *   @public
+     */
+    show: function (params) {
+     this._show(params);
+    },
+
+    /**
+     *  Hide component
+     *  @public
+     */
+    hide: function () {
+      this._hide();
+    }
+
+
+  });
+
+</script>
