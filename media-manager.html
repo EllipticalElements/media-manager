@@ -1052,6 +1052,11 @@
       _clipboard:{
         type:Object,
         value:null
+      },
+
+      _initialFilesLength:{
+        type:Number,
+        value:0
       }
     },
 
@@ -1474,15 +1479,17 @@
       this._renderModal();
       this._setAttachIconState();
       this.classList.remove('hide');
-      if(params.files && mode!=='browse'){
+      if(params.files && params.files.length >0 && mode!=='browse'){
         this.selectedFiles=[];
         this.selectedFiles=params.files;
+        this._initialFilesLength=params.files.length;
         var file=params.files[0];
         this.selectedFile=file;
         this._notifySelectedFiles(params.files);
         this._setCameraContainerActive(file);
+        if(mode==='multi-select') this._setSortable();
       }
-      if(mode==='multi-select') this._setSortable();
+
     },
 
 
@@ -1626,7 +1633,7 @@
       data.id=this._publishId;
       if(mode==='select') data.files=this.selectedFiles;
       else data.files=this._getSortedSelectedFiles();
-      if(data.files.length >0){
+      if(data.files.length >0 || this._initialFilesLength >0){
         this.fire('media-manager-selected',data);
         this._showNotification('Selected media files attached');
       }
@@ -1641,7 +1648,7 @@
     _selectedFileChanged: function (newValue, oldValue) {
       var mode = this.mode;
       if (mode === 'browse') return;
-      if (!newValue.id) return;
+      if (!newValue || !newValue.id) return;
       var selectedFiles = this.selectedFiles;
       if (mode === 'select') this._setSelectedFilesSingleMode(newValue, selectedFiles);
       else if (mode === 'multi-select') this._setSelectedFilesMultiMode(newValue, selectedFiles);
@@ -1796,7 +1803,7 @@
      */
     _destroySortable:function(){
       var $multiSelect=$(this.$.multiSelect);
-      $multiSelect.sortable('destroy');
+      if ($multiSelect.data( 'ui-sortable' )) $multiSelect.sortable('destroy');
     },
 
 
@@ -2320,6 +2327,7 @@
         this.selectedFile={};
         this._resetSelectedFiles();
       }
+      this._initialFilesLength=0;
       if(mode==='multi-select') this._destroySortable();
       this._resetCameraContainerActive();
       var containerId='libraryContainer';
