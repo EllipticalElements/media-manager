@@ -857,7 +857,7 @@
             <p>
               Select or drag files to add to your media gallery
             </p>
-            <md-upload id="mediaManagerUpload" service="[[service]]"></md-upload>
+            <md-upload id="mediaManagerUpload" service="[[service]]" post-url="[[postUrl]]"></md-upload>
           </div>
 
         </section>
@@ -1007,6 +1007,11 @@
       serviceInitDelay:{
         type:Number,
         value:1500
+      },
+
+      postUrl:{
+        type:String,
+        value:null
       },
 
       _currentContainerId: {
