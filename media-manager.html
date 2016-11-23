@@ -85,6 +85,7 @@
   media-manager > header ui-input-addon .ui-button:active {
     box-shadow: none;
   }
+  
 </style>
 <dom-module id="media-manager">
   <style>
@@ -433,6 +434,14 @@
       overflow-y:scroll;
     }
 
+    :host > section > aside .header-info {
+      min-height:38px;
+    }
+
+    :host > section > aside .header-info>h6 {
+      font-size:14px;
+    }
+
     :host > section > aside section [scrollable]{
       display: -webkit-flex;
       display: flex;
@@ -664,6 +673,11 @@
       padding: 0 2em;
     }
 
+    :host > footer > paper-button{
+      color:var(--media-manager-button-color, #212121);
+      font-size:16px;
+    }
+
     @media (max-width: 1024px) {
       :host {
         width: 98%;
@@ -876,12 +890,13 @@
             </div>
           </div>
         </div>
-        <header>
+        <header class="header-info">
           <h6 id="imageInfo">File Info</h6>
         </header>
          <section>
            <div scrollable>
              <md-input label="Title" data-id="title" readonly="true" class="hidden" id="imageTitle" value$="{{selectedFile.title}}"></md-input>
+             <md-input label="Meta" data-id="meta" readonly="true" class="hidden" id="imageMeta" value$="{{selectedFile.meta}}"></md-input>
              <div class="link-box hidden" id="linkBox">
                <md-input label="Link" data-id="link" readonly="true" id="imageLink" value$="{{selectedFile.link}}"></md-input>
                <span class="icon-link link inactive" id="pasteLink" on-tap="_onPaste"></span>
@@ -917,6 +932,7 @@
    *       type:<String>
    *       isImage:<Boolean>
    *       title:<String>,
+   *       meta:<String>,
    *       link:<String>,
    *       width:<Number>,
    *       active:<Boolean>
@@ -1057,11 +1073,6 @@
       _clipboard:{
         type:Object,
         value:null
-      },
-
-      _initialFilesLength:{
-        type:Number,
-        value:0
       }
     },
 
@@ -1487,14 +1498,12 @@
       if(params.files && params.files.length >0 && mode!=='browse'){
         this.selectedFiles=[];
         this.selectedFiles=params.files;
-        this._initialFilesLength=params.files.length;
         var file=params.files[0];
         this.selectedFile=file;
         this._notifySelectedFiles(params.files);
         this._setCameraContainerActive(file);
-        if(mode==='multi-select') this._setSortable();
       }
-
+      if(mode==='multi-select') this._setSortable();
     },
 
 
@@ -1503,6 +1512,7 @@
      */
     _showAsideInput: function () {
       this.$.imageTitle.classList.remove('hidden');
+      this.$.imageMeta.classList.remove('hidden');
       this.$.linkBox.classList.remove('hidden');
       this.$.imageWidth.classList.remove('hidden');
       this.$.targetBox.classList.remove('hidden');
@@ -1580,12 +1590,14 @@
         baseUrl: '', rawUrl: '', page: page, pageSize: pageSize
       })
               .get({}, function (err, result) {
-                self._hideNotificationDelay();
-                self.files = result.data;
-                self._setActiveFilesAsync();
-                self._totalFiles = result.pagination.count;
-                self._setPaginationData(result.pagination);
-                self._setLibraryFilesMessage();
+                if(!err){
+                   self._hideNotificationDelay();
+                   self.files = result.data;
+                   self._setActiveFilesAsync();
+                   self._totalFiles = result.pagination.count;
+                   self._setPaginationData(result.pagination);
+                   self._setLibraryFilesMessage();
+                }
               });
     },
 
@@ -1607,12 +1619,14 @@
       })
               .filter({id:term})
               .get({}, function (err, result) {
-                self._hideNotificationDelay();
-                self.files = result.data;
-                self._setActiveFilesAsync();
-                self._totalQueryFiles = result.pagination.count;
-                self._setPaginationData(result.pagination);
-                self._setLibraryFilesMessage();
+                if(!err){
+                  self._hideNotificationDelay();
+                  self.files = result.data;
+                  self._setActiveFilesAsync();
+                  self._totalQueryFiles = result.pagination.count;
+                  self._setPaginationData(result.pagination);
+                  self._setLibraryFilesMessage();
+                }
               });
     },
 
@@ -1638,7 +1652,7 @@
       data.id=this._publishId;
       if(mode==='select') data.files=this.selectedFiles;
       else data.files=this._getSortedSelectedFiles();
-      if(data.files.length >0 || this._initialFilesLength >0){
+      if(data.files.length >0){
         this.fire('media-manager-selected',data);
         this._showNotification('Selected media files attached');
       }
@@ -1713,6 +1727,7 @@
         if(!entity.newTarget) entity.newTarget=false;
         this.notifyPath('files.' + index + '.active', true);
         this.notifyPath('files.' + index + '.title', file.title);
+        this.notifyPath('files.' + index + '.title', file.meta);
         this.notifyPath('files.' + index + '.link', file.link);
         this.notifyPath('files.' + index + '.width', file.width);
         this.notifyPath('files.' + index + '.newTarget', file.newTarget);
@@ -2184,6 +2199,7 @@
      */
     _setInputWriteProperties: function () {
       this.$.imageTitle.setWritable();
+      this.$.imageMeta.setWritable();
       this.$.imageLink.setWritable();
       this.$.imageWidth.setWritable();
       this.$.target.setEnabled();
@@ -2195,6 +2211,7 @@
      */
     _setInputReadonlyProperties: function () {
       this.$.imageTitle.setReadonly();
+      this.$.imageMeta.setReadonly();
       this.$.imageLink.setReadonly();
       this.$.imageWidth.setReadonly();
       this.$.target.setDisabled();
@@ -2220,7 +2237,7 @@
      */
     _setLibraryFilesMessage: function () {
       var files = this.files;
-      if (files.length < 1) this.$.filesMessage.classList.remove('hide');
+      if (files && files.length < 1) this.$.filesMessage.classList.remove('hide');
       else this.$.filesMessage.classList.add('hide');
     },
 
@@ -2332,7 +2349,6 @@
         this.selectedFile={};
         this._resetSelectedFiles();
       }
-      this._initialFilesLength=0;
       if(mode==='multi-select') this._destroySortable();
       this._resetCameraContainerActive();
       var containerId='libraryContainer';
