@@ -18,6 +18,7 @@
 <link rel="import" href="../iron-icons/device-icons.html">
 <link rel="import" href="../iron-icons/editor-icons.html">
 <link rel="import" href="../jquery-ui-import/sortable.html">
+<link rel="import" href="../paper-card/paper-card.html">
 
 <!--
   css variables
@@ -362,7 +363,7 @@
     }
 
 
-    :host > section > aside .camera-container iron-icon {
+    :host > section > aside .camera-container iron-icon.camera {
       height: 64px;
       width:64px;
       position: absolute;
@@ -375,7 +376,7 @@
       background:#fff;
     }
 
-    :host > section > aside .camera-container.active iron-icon {
+    :host > section > aside .camera-container.active iron-icon.camera {
       display:none;
     }
 
@@ -391,6 +392,53 @@
       transition: var(--media-manager-transition, all 0.25s linear);
     }
 
+    :host > section > aside .camera-container paper-card{
+      position:absolute;
+      top:0;
+      left:0;
+      z-index:99;
+      width:80%;
+      height:80%;
+    }
+
+    :host > section > aside .camera-container paper-card>header{
+      display:-webkit-flex;
+      display:flex;
+      -webkit-justify-content:space-between;
+      justify-content:space-between;
+      -webkit-align-items:center;
+      align-items:center;
+      height:25px;
+      background:var(--media-manager-accent-color,#60bc57);
+      color:var(--media-manager-accent-font-color,#fff);
+    }
+    :host > section > aside .camera-container paper-card>header>iron-icon.close{
+      height:16px;
+      width:16px;
+      cursor:pointer;
+    }
+    :host > section > aside .camera-container paper-card>section{
+      display:-webkit-flex;
+      display:flex;
+      -webkit-flex-wrap:wrap;
+      flex-wrap:wrap;
+      -webkit-justify-content:space-between;
+      justify-content:space-between;
+      padding:6px 10px;
+      font-size:12px;
+      color:var(--media-manager-text-color, #646464);
+      overflow:hidden;
+    }
+    :host > section > aside .camera-container paper-card>section>div{
+      display:-webkit-flex;
+      display:flex;
+      width:50%;
+      margin-bottom:8px;
+    }
+    :host > section > aside .camera-container paper-card>section>div.data{
+      -webkit-justify-content:flex-end;
+      justify-content:flex-end;
+    }
     :host > section > aside .camera-container .camera-file-container  .camera-file-inner-container{
       display: -webkit-flex;
       display: flex;
@@ -404,6 +452,10 @@
 
     :host > section > aside .camera-container .camera-file-container  .camera-file-inner-container .camera-nested-inner-container{
       max-height:100%;
+    }
+
+    :host > section > aside .camera-container .camera-file-container  .camera-file-inner-container .camera-nested-inner-container img[src*=".svg"]{
+      width:100%;
     }
 
     :host > section > aside .camera-container .camera-file-container .info-container{
@@ -482,6 +534,22 @@
       max-height:30px;
     }
 
+    :host > section > aside .library-info-box{
+      display:none;
+      margin-bottom:32px;
+      color:var(--media-manager-text-color, #646464); 
+    }
+    :host > section > aside .library-info-box h3{
+      color: var(--media-manager-accent-color, #60bc57);
+      margin-bottom:16px;
+    }
+    :host > section > aside .library-info-box>div{
+      display: -webkit-flex;
+      display: flex;
+    }
+    :host > section > aside .library-info-box>div>span:first-of-type{
+      width:65px;
+    }
     :host > section > aside .target-box>span{
       margin:-.5em 1em 0 0;
       color:var(--media-manager-text-light-color, #9e9e9e);
@@ -650,6 +718,10 @@
       max-height:100%;
     }
 
+    :host > section > .main-container > section  .flex-library .file-container>.file-inner-container>.file-nested-inner-container img[src*=".svg"]{
+      width:100%;
+    }
+
     :host > section > .main-container > section .library-container-header{
       display: -webkit-flex;
       display: flex;
@@ -732,6 +804,12 @@
       :host > section > aside header {
         border-top: var(--galery-editor-border, 1px solid #e2e2e2);
       }
+      :host > section > aside .library-info-box{
+        display:-webkit-flex;
+        display:flex;
+        -webkit-flex-direction:column;
+        flex-direction:column;
+      }
     }
   </style>
   <template>
@@ -806,6 +884,7 @@
                   </div>
                    <div class="hover-container">
                      <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onLibraryClipboard"></iron-icon>
+                     <iron-icon icon="info" data-id$="[[file.id]]" on-tap="_onLibraryInfo"></iron-icon>
                      <iron-icon icon="delete" data-id$="[[file.id]]" on-tap="_onLibraryDelete"></iron-icon>
                    </div>
                  </div>
@@ -831,6 +910,7 @@
                     </div>
                     <div class="hover-container">
                       <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onRecentClipboard"></iron-icon>
+                      <iron-icon icon="info" data-id$="[[file.id]]" on-tap="_onRecentInfo"></iron-icon>
                       <iron-icon icon="delete" data-id$="[[file.id]]" on-tap="_onLibraryDelete"></iron-icon>
                     </div>
                   </div>
@@ -856,6 +936,7 @@
                     </div>
                     <div class="hover-container">
                       <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onSelectedClipboard"></iron-icon>
+                      <iron-icon icon="info" data-id$="[[file.id]]" on-tap="_onSelectedInfo"></iron-icon>
                       <iron-icon icon="remove" data-id$="[[file.id]]" on-tap="_onSelectedRemove"></iron-icon>
                     </div>
                   </div>
@@ -878,7 +959,24 @@
       </div>
       <aside id="aside">
         <div class="camera-container" id="cameraContainer">
-          <iron-icon icon="image:camera-alt"></iron-icon>
+          <paper-card id="paperCard" class="hide">
+            <header>
+              <div>
+                <iron-icon icon="image:image-aspect-ratio"></iron-icon>
+                <span>Image Info</span>
+              </div>
+              <iron-icon icon="close" on-tap="_onCardCloseClick" class="close"></iron-icon>
+            </header>
+            <section>
+              <div>Size:</div>
+              <div class="data">{{selectedFile.size}}</div>
+              <div>Width:</div>
+              <div class="data">{{selectedFile.imageWidth}}</div>
+              <div>Height:</div>
+              <div class="data">{{selectedFile.imageHeight}}</div>
+            </section>
+          </paper-card>  
+          <iron-icon icon="image:camera-alt" class="camera"></iron-icon>
           <div class="camera-file-container hide" id="cameraFileContainer">
             <div class="camera-file-inner-container">
               <div class="camera-nested-inner-container">
@@ -906,6 +1004,21 @@
                <md-checkbox attribute-listener="true" data-id="newTarget" id="target" disabled="true" checked$="{{selectedFile.newTarget}}"></md-checkbox>
              </div>
              <md-input label="Width" data-id="width" readonly="true" class="hidden" id="imageWidth" value$="{{selectedFile.width}}"></md-input>
+            <div class="library-info-box">
+              <h3>Library Info</h3>
+              <div>
+                <span>Size:</span> 
+                <span>{{selectedFile.size}}</span>
+              </div>
+              <div>
+                 <span>Width:</span>
+                 <span>{{selectedFile.imageWidth}}</span>
+              </div>
+              <div>
+                 <span>Height:</span>
+                 <span>{{selectedFile.imageHeight}}</span>
+              </div>
+            </div>  
            </div>
          </section>
       </aside>
@@ -1265,10 +1378,20 @@
      *  @param event {object}
      */
     _onLibraryFileClick: function (event) {
-      var mode = this.mode;
       var actualTarget = event.target;
       if (actualTarget.tagName === 'IRON-ICON') return;
+      this._hideCard();
       var target = event.currentTarget;
+      this._parseLibrarySelection(target);
+    },
+
+
+    /**
+    *  Library File click handler
+    *  @param target {object}
+    */
+    _parseLibrarySelection:function(target){
+      var mode = this.mode;
       var id = target.dataset.id;
       if (mode === 'multi-select') this._onLibraryMultiSelectFileClick(id, target);
       else if(mode==='select') this._onLibrarySelectFileClick(id,target);
@@ -1295,7 +1418,6 @@
         this._setSelectedFile(entity);
         this._notifyActiveState('files', entity);
         this._notifyActiveState('recentFiles', entity);
-
         this._setCameraContainerActive(entity);
       }
     },
@@ -1347,10 +1469,20 @@
      *  @param event {object}
      */
     _onSelectedFileClick: function (event) {
-      var mode = this.mode;
       var actualTarget = event.target;
       if (actualTarget.tagName === 'IRON-ICON') return;
+      this._hideCard();
       var target = event.currentTarget;
+      this._parseSelection(target);
+    },
+
+
+    /**
+    *  Selected File click handler
+    *  @param target {object}
+    */
+    _parseSelection:function(target){
+      var mode = this.mode;
       var id = target.dataset.id;
       if (mode !== 'browse') {
         var entity = this._getSelectedEntityFromSelectedFiles(id);
@@ -1415,6 +1547,7 @@
 
     /**
      *  MD-INPUT change handler
+     *  @param event {object}
      */
     _onInputChange: function (event) {
       if (this.mode === 'browse') return;
@@ -1427,6 +1560,7 @@
 
     /**
      *  MD-INPUT change handler
+     *  @param event {object}
      */
     _onCheckboxChange: function (event) {
       if (this.mode === 'browse') return;
@@ -1440,14 +1574,30 @@
 
     /**
      *   Library files copy to clipboard handler
+     *   @param event {object}
      */
     _onLibraryClipboard:function(event){
       this._setClipboard(event.target,'files');
     },
 
+    
+    /**
+    *  On Library File Info Icon click
+    *  @param event {object}
+    */
+     _onLibraryInfo:function(event){
+       var target=event.target;
+       var id=target.dataset.id
+       var entity = this._getSelectedEntity(id);
+       this._showCard();
+       if(!entity.active) this._parseLibrarySelection(target);
+       this._getFileInfo(id,entity);
+    },
+
 
     /**
      *   Recently added files copy to clipboard handler
+     *   @param event {object}
      */
     _onRecentClipboard:function(event){
       this._setClipboard(event.target,'recentFiles');
@@ -1455,7 +1605,22 @@
 
 
     /**
+    *  On Recent File Info Icon click
+    *  @param event {object}
+    */
+    _onRecentInfo:function(event){
+       var target=event.target;
+       var id=target.dataset.id
+       var entity = this._getSelectedEntity(id);
+       this._showCard();
+       if(!entity.active) this._parseLibrarySelection(target);
+       this._getFileInfo(id,entity);
+    },
+
+
+    /**
      *   Selected files copy to clipboard handler
+     *   @param event {object}
      */
     _onSelectedClipboard:function(event){
       this._setClipboard(event.target,'selectedFiles');
@@ -1463,7 +1628,41 @@
 
 
     /**
+    *  On Selected File Info Icon click
+    *  @param event {object}
+    */
+    _onSelectedInfo:function(event){
+       var target=event.target;
+       var id=target.dataset.id
+       var entity = this._getSelectedEntity(id);
+       this._showCard();
+       if(!entity.active) this._parseSelection(target);
+       this._getFileInfo(id,entity);
+    },
+
+   /**
+   *   Get File Info
+   *   @param id {string}
+   *   @param entity {object}
+   */
+   _getFileInfo:function(id,entity){
+      var self=this;
+      if(!entity.imageWidth){
+         if(id.indexOf('.svg') > -1){
+            this._getSvgFileInfo(id,entity.url,function(file){
+              self._notifySelectedFileInfo(entity,file);
+            });
+         }else{
+            this._serviceGetFile(id,function(file){
+              self._notifySelectedFileInfo(entity,file);
+            });
+         } 
+      }
+   },
+
+    /**
      *  On clipboard paste handler
+     *  @param event {object}
      */
     _onPaste:function(event){
       var target=event.target;
@@ -1476,6 +1675,15 @@
       this.selectedFile = {};
       this.selectedFile = file;
       this._resetClipboard();
+    },
+
+
+    /**
+    *  On paper-card close
+    *  @param event {object}
+    */
+    _onCardCloseClick:function(event){
+      this._hideCard();
     },
 
     /***************************** PRIVATE METHODS ********************************************************************/
@@ -1528,6 +1736,7 @@
       notify.show(msg);
     },
 
+
     /**
      *   Show notification delay
      */
@@ -1538,6 +1747,13 @@
       if(notify.showOnDelay) notify.showOnDelay(msg);
     },
 
+
+    /**
+    *   Show paper-card
+    */
+     _showCard:function(){
+      this.$.paperCard.classList.remove('hide');
+    },
 
 
     /**
@@ -1572,6 +1788,14 @@
         var notify = this._notifyService;
         if(notify.hideOnDelay) notify.hideOnDelay();
       }
+    },
+
+
+    /**
+    *  Hide paper-card
+    */
+    _hideCard:function(){
+      this.$.paperCard.classList.add('hide');
     },
 
 
@@ -1628,6 +1852,42 @@
                   self._setLibraryFilesMessage();
                 }
               });
+    },
+
+    /**
+    *   Get File
+    *   @param id {string}
+    *   @param callback {function}
+    */
+    _serviceGetFile:function(id,callback){
+        var self=this;
+        var Service = this._service;
+        Service.get({id:id},function(err,data){
+          if(!err) callback(data);
+          else self._showNotification('Error retrieving file');
+        });
+    },
+
+    /**
+    *   Get File
+    *   @param id {string}
+    *   @param src {string}
+    *   @param callback {function}
+    */
+    _getSvgFileInfo:function(id,src,callback){
+        try{
+          var file={};
+          file.id=id;
+          var img = new Image();
+          img.onload = function(){
+             file.imageWidth=img.width + 'px';
+             file.imageHeight=img.height + 'px';
+             callback(file);
+          };
+          img.src = src
+        }catch(ex){
+          this._showNotification('Error retrieving file');
+        }
     },
 
 
@@ -1713,7 +1973,7 @@
      *  Updated library file with selectedFiles entity props
      *  @param file {object}
      */
-    _notifySelectedFile(file){
+    _notifySelectedFile:function(file){
       var files = this.files;
       var array = this._utils.array;
       var entity = array.findById(files, file.id);
@@ -1723,6 +1983,7 @@
         entity.title=file.title;
         entity.link=file.link;
         entity.width=file.width;
+        entity.meta=file.meta;
         entity.dataLink=file.dataLink;
         if(!entity.newTarget) entity.newTarget=false;
         this.notifyPath('files.' + index + '.active', true);
@@ -1732,6 +1993,15 @@
         this.notifyPath('files.' + index + '.width', file.width);
         this.notifyPath('files.' + index + '.newTarget', file.newTarget);
       }
+    },
+
+    _notifySelectedFileInfo:function(entity,file){
+       entity.imageWidth=file.imageWidth;
+       entity.imageHeight=file.imageHeight;
+       this.selectedFile.imageWidth=file.imageWidth;
+       this.selectedFile.imageHeight=file.imageHeight;
+       this.notifyPath('selectedFile.imageWidth',file.imageWidth);
+       this.notifyPath('selectedFile.imageHeight',file.imageHeight);
     },
 
 
@@ -2017,7 +2287,7 @@
 
 
     /**
-     *  Set the selectedFile observale to a file entity
+     *  Set the selectedFile observable to a file entity
      *  @param entity {object}
      */
     _setSelectedFile: function (entity) {
@@ -2357,6 +2627,7 @@
       this._resetButtonState();
       this._resetClipboard();
       this._publishId=null;
+      this._hideCard();
     },
 
 
