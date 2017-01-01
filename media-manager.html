@@ -64,6 +64,24 @@
     outline: 0;
   }
 
+  media-manager > header ui-input-addon{
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+    margin: 0;
+    position: relative;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  media-manager > header ui-input-addon input[type=text]{
+    width:100%;
+    padding: 0.5em 0.75em;
+  }
+
   media-manager > header ui-input-addon input[type=text]:focus {
     border: 0;
     outline: 0 !important;
@@ -86,7 +104,39 @@
   media-manager > header ui-input-addon .ui-button:active {
     box-shadow: none;
   }
-  
+
+  media-manager ui-input-addon input:last-child, ui-input-addon .ui-button:last-child, ui-input-addon ui-button:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+
+  media-manager ui-input-addon input, ui-input-addon .ui-button, ui-input-addon ui-button {
+    padding: 0.3em 0.55em;
+  }
+
+  media-manager ui-input-addon .ui-button, ui-input-addon ui-button {
+    margin: 0;
+  }
+
+  media-manager .ui-button {
+    text-transform: uppercase;
+    max-height: 38px;
+    min-width: 80px;
+    padding: 0.7em 1em 0.7em 1em;
+    font-size: 1em;
+    margin: 0.5em 0 0 0;
+    border-radius: 0;
+    font-family: inherit;
+    font-weight: normal;
+    text-align: center;
+    line-height: 1 !important;
+    position: relative;
+    cursor: pointer !important;
+    display: inline-block;
+    outline: 0;
+  }
+
 </style>
 <dom-module id="media-manager">
   <style>
@@ -134,6 +184,10 @@
 
     :host h4{
       font-size: 1.68em;
+    }
+
+    :host h4,h5,h6{
+      font-family: 'robotoregular';
     }
 
     :host .icon{
@@ -458,7 +512,7 @@
       width:100%;
     }
 
-    :host > section > aside .camera-container .camera-file-container .info-container{
+    :host > section > aside .camera-container .camera-file-container .mm-info-container{
       bottom: 0;
       height: 30px;
       left: 0;
@@ -488,10 +542,12 @@
 
     :host > section > aside .header-info {
       min-height:38px;
+      max-height:38px;
     }
 
     :host > section > aside .header-info>h6 {
       font-size:14px;
+      margin:0;
     }
 
     :host > section > aside section [scrollable]{
@@ -952,7 +1008,7 @@
             <p>
               Select or drag files to add to your media gallery
             </p>
-            <md-upload id="mediaManagerUpload" service="[[service]]" post-url="[[postUrl]]"></md-upload>
+            <md-upload id="mediaManagerUpload" service="[[service]]" post-url="[[postUrl]]" basic-token="[[basicToken]]"></md-upload>
           </div>
 
         </section>
@@ -983,7 +1039,7 @@
                 <img id="cameraImage">
               </div>
             </div>
-            <div class="info-container">
+            <div class="mm-info-container">
               <span class="icon-name"></span>
             </div>
           </div>
@@ -1143,6 +1199,17 @@
         value:null
       },
 
+      disableOnload:{
+        type:Boolean,
+        value:false
+      },
+
+      basicToken:{
+        type:String,
+        value:null
+      },
+
+
       _currentContainerId: {
         type: String,
         value: 'libraryContainer'
@@ -1195,6 +1262,7 @@
      *  Ready
      */
     ready: function () {
+      var self=this;
       this._setUtils();
       var showAsideInput = this._showAsideInput.bind(this);
       var service=this._serviceLibraryFiles.bind(this);
@@ -1205,7 +1273,7 @@
       showAsideInput();
       var delay=this.serviceInitDelay;
       setTimeout(function(){
-        service(1);
+        if(!self.disableOnload) service(1);
       },delay);
     },
 
@@ -1699,11 +1767,11 @@
       if (!mode) this.mode = 'browse';
       else this.mode = mode;
       if(params.id) this._setPublishId(params.id);
-      this.$.mode.innerText = mode;
+      this.$.mode.innerText = this.mode;
       this._renderModal();
       this._setAttachIconState();
       this.classList.remove('hide');
-      if(params.files && params.files.length >0 && mode!=='browse'){
+      if(params.files && params.files.length >0 && this.mode!=='browse'){
         this.selectedFiles=[];
         this.selectedFiles=params.files;
         var file=params.files[0];
