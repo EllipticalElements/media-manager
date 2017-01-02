@@ -1873,9 +1873,10 @@
      */
     _serviceLibraryFiles: function (page) {
       var self = this;
+      var Service = this._service;
+      if(!Service) return;
       var pageSize = this.pageSize;
       this._totalQueryFiles = 0;
-      var Service = this._service;
       var service = new Service();
       this._showNotificationDelay();
       service.paginate({
@@ -1901,9 +1902,10 @@
      */
     _serviceSearchFiles: function (page, term) {
       var self = this;
+      var Service = this._service;
+      if(!Service) return;
       var pageSize = this.pageSize;
       this._currentPage = page;
-      var Service = this._service;
       var service = new Service();
       this._showNotificationDelay();
       service.paginate({
@@ -2447,7 +2449,7 @@
     _setNotificationService: function () {
       var notifyServiceName = this.notifyService;
       var Notify = this.$service(notifyServiceName);
-      this._notifyService = new Notify();
+      if(Notify) this._notifyService = new Notify();
     },
 
 
