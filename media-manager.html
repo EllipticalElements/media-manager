@@ -593,7 +593,7 @@
     :host > section > aside .library-info-box{
       display:none;
       margin-bottom:32px;
-      color:var(--media-manager-text-color, #646464); 
+      color:var(--media-manager-text-color, #646464);
     }
     :host > section > aside .library-info-box h3{
       color: var(--media-manager-accent-color, #60bc57);
@@ -879,10 +879,10 @@
           <iron-icon icon="device:storage" class="active" id="library" on-tap="_onLibraryClick"></iron-icon>
           <paper-tooltip offset="0">Library</paper-tooltip>
         </div>
-         <div class="icon-container">
-           <iron-icon icon="folder-open" id="recent" on-tap="_onRecentClick"></iron-icon>
-           <paper-tooltip offset="0">Recently Added</paper-tooltip>
-         </div>
+        <div class="icon-container">
+          <iron-icon icon="folder-open" id="recent" on-tap="_onRecentClick"></iron-icon>
+          <paper-tooltip offset="0">Recently Added</paper-tooltip>
+        </div>
         <div class="icon-container">
           <iron-icon icon="editor:attach-file" class="inactive" id="attach" on-tap="_onAttachClick"></iron-icon>
           <paper-tooltip offset="0">Selected</paper-tooltip>
@@ -931,21 +931,21 @@
 
             <div class="flex-library">
               <template is="dom-repeat" items="[[files]]" as="file">
-               <div class="file-outer-container">
-                 <div class="file-container" library-file data-id$="[[file.id]]" active$="[[file.active]]">
-                  <div class="file-inner-container">
-                    <div class="file-nested-inner-container">
-                      <img src="[[_getUrl(file)]]">
+                <div class="file-outer-container">
+                  <div class="file-container" library-file data-id$="[[file.id]]" active$="[[file.active]]">
+                    <div class="file-inner-container">
+                      <div class="file-nested-inner-container">
+                        <img src="[[_getUrl(file)]]">
+                      </div>
+                    </div>
+                    <div class="hover-container">
+                      <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onLibraryClipboard"></iron-icon>
+                      <iron-icon icon="info" data-id$="[[file.id]]" on-tap="_onLibraryInfo"></iron-icon>
+                      <iron-icon icon="delete" data-id$="[[file.id]]" on-tap="_onLibraryDelete"></iron-icon>
                     </div>
                   </div>
-                   <div class="hover-container">
-                     <iron-icon icon="content-copy" data-id$="[[file.id]]" on-tap="_onLibraryClipboard"></iron-icon>
-                     <iron-icon icon="info" data-id$="[[file.id]]" on-tap="_onLibraryInfo"></iron-icon>
-                     <iron-icon icon="delete" data-id$="[[file.id]]" on-tap="_onLibraryDelete"></iron-icon>
-                   </div>
-                 </div>
-                 <div class="file-name">[[file.id]]</div>
-               </div>
+                  <div class="file-name">[[file.id]]</div>
+                </div>
               </template>
               <div id="filesMessage" class="hide">No files available...</div>
             </div>
@@ -1031,7 +1031,7 @@
               <div>Height:</div>
               <div class="data">{{selectedFile.imageHeight}}</div>
             </section>
-          </paper-card>  
+          </paper-card>
           <iron-icon icon="image:camera-alt" class="camera"></iron-icon>
           <div class="camera-file-container hide" id="cameraFileContainer">
             <div class="camera-file-inner-container">
@@ -1047,36 +1047,36 @@
         <header class="header-info">
           <h6 id="imageInfo">File Info</h6>
         </header>
-         <section>
-           <div scrollable>
-             <md-input label="Title" data-id="title" readonly="true" class="hidden" id="imageTitle" value$="{{selectedFile.title}}"></md-input>
-             <md-input label="Meta" data-id="meta" readonly="true" class="hidden" id="imageMeta" value$="{{selectedFile.meta}}"></md-input>
-             <div class="link-box hidden" id="linkBox">
-               <md-input label="Link" data-id="link" readonly="true" id="imageLink" value$="{{selectedFile.link}}"></md-input>
-               <span class="icon-link link inactive" id="pasteLink" on-tap="_onPaste"></span>
-             </div>
-             <div class="target-box hidden" id="targetBox">
-               <span>New Target</span>
-               <md-checkbox attribute-listener="true" data-id="newTarget" id="target" disabled="true" checked$="{{selectedFile.newTarget}}"></md-checkbox>
-             </div>
-             <md-input label="Width" data-id="width" readonly="true" class="hidden" id="imageWidth" value$="{{selectedFile.width}}"></md-input>
+        <section>
+          <div scrollable>
+            <md-input label="Title" data-id="title" readonly="true" class="hidden" id="imageTitle" value$="{{selectedFile.title}}"></md-input>
+            <md-input label="Meta" data-id="meta" readonly="true" class="hidden" id="imageMeta" value$="{{selectedFile.meta}}"></md-input>
+            <div class="link-box hidden" id="linkBox">
+              <md-input label="Link" data-id="link" readonly="true" id="imageLink" value$="{{selectedFile.link}}"></md-input>
+              <span class="icon-link link inactive" id="pasteLink" on-tap="_onPaste"></span>
+            </div>
+            <div class="target-box hidden" id="targetBox">
+              <span>New Target</span>
+              <md-checkbox attribute-listener="true" data-id="newTarget" id="target" disabled="true" checked$="{{selectedFile.newTarget}}"></md-checkbox>
+            </div>
+            <md-input label="Width" data-id="width" readonly="true" class="hidden" id="imageWidth" value$="{{selectedFile.width}}"></md-input>
             <div class="library-info-box">
               <h3>Library Info</h3>
               <div>
-                <span>Size:</span> 
+                <span>Size:</span>
                 <span>{{selectedFile.size}}</span>
               </div>
               <div>
-                 <span>Width:</span>
-                 <span>{{selectedFile.imageWidth}}</span>
+                <span>Width:</span>
+                <span>{{selectedFile.imageWidth}}</span>
               </div>
               <div>
-                 <span>Height:</span>
-                 <span>{{selectedFile.imageHeight}}</span>
+                <span>Height:</span>
+                <span>{{selectedFile.imageHeight}}</span>
               </div>
-            </div>  
-           </div>
-         </section>
+            </div>
+          </div>
+        </section>
       </aside>
     </section>
     <footer>
@@ -1455,9 +1455,9 @@
 
 
     /**
-    *  Library File click handler
-    *  @param target {object}
-    */
+     *  Library File click handler
+     *  @param target {object}
+     */
     _parseLibrarySelection:function(target){
       var mode = this.mode;
       var id = target.dataset.id;
@@ -1546,9 +1546,9 @@
 
 
     /**
-    *  Selected File click handler
-    *  @param target {object}
-    */
+     *  Selected File click handler
+     *  @param target {object}
+     */
     _parseSelection:function(target){
       var mode = this.mode;
       var id = target.dataset.id;
@@ -1597,7 +1597,12 @@
     _onNext: function (event) {
       var page = this._currentPage;
       page += 1;
-      this._serviceLibraryFiles(page);
+      this._currentPage=page;
+      var term=this.$.searchInput.value;
+      if(term !==''){
+        this._serviceSearchFiles(page, term);
+      }else this._serviceLibraryFiles(page);
+
     },
 
 
@@ -1609,7 +1614,11 @@
       var page = this._currentPage;
       page -= 1;
       if (page < 1) page = 1;
-      this._serviceLibraryFiles(page);
+      this._currentPage=page;
+      var term=this.$.searchInput.value;
+      if(term !==''){
+        this._serviceSearchFiles(page, term);
+      }else this._serviceLibraryFiles(page);
     },
 
 
@@ -1648,18 +1657,18 @@
       this._setClipboard(event.target,'files');
     },
 
-    
+
     /**
-    *  On Library File Info Icon click
-    *  @param event {object}
-    */
-     _onLibraryInfo:function(event){
-       var target=event.target;
-       var id=target.dataset.id
-       var entity = this._getSelectedEntity(id);
-       this._showCard();
-       if(!entity.active) this._parseLibrarySelection(target);
-       this._getFileInfo(id,entity);
+     *  On Library File Info Icon click
+     *  @param event {object}
+     */
+    _onLibraryInfo:function(event){
+      var target=event.target;
+      var id=target.dataset.id
+      var entity = this._getSelectedEntity(id);
+      this._showCard();
+      if(!entity.active) this._parseLibrarySelection(target);
+      this._getFileInfo(id,entity);
     },
 
 
@@ -1673,16 +1682,16 @@
 
 
     /**
-    *  On Recent File Info Icon click
-    *  @param event {object}
-    */
+     *  On Recent File Info Icon click
+     *  @param event {object}
+     */
     _onRecentInfo:function(event){
-       var target=event.target;
-       var id=target.dataset.id
-       var entity = this._getSelectedEntity(id);
-       this._showCard();
-       if(!entity.active) this._parseLibrarySelection(target);
-       this._getFileInfo(id,entity);
+      var target=event.target;
+      var id=target.dataset.id
+      var entity = this._getSelectedEntity(id);
+      this._showCard();
+      if(!entity.active) this._parseLibrarySelection(target);
+      this._getFileInfo(id,entity);
     },
 
 
@@ -1696,37 +1705,37 @@
 
 
     /**
-    *  On Selected File Info Icon click
-    *  @param event {object}
-    */
+     *  On Selected File Info Icon click
+     *  @param event {object}
+     */
     _onSelectedInfo:function(event){
-       var target=event.target;
-       var id=target.dataset.id
-       var entity = this._getSelectedEntity(id);
-       this._showCard();
-       if(!entity.active) this._parseSelection(target);
-       this._getFileInfo(id,entity);
+      var target=event.target;
+      var id=target.dataset.id
+      var entity = this._getSelectedEntity(id);
+      this._showCard();
+      if(!entity.active) this._parseSelection(target);
+      this._getFileInfo(id,entity);
     },
 
-   /**
-   *   Get File Info
-   *   @param id {string}
-   *   @param entity {object}
-   */
-   _getFileInfo:function(id,entity){
+    /**
+     *   Get File Info
+     *   @param id {string}
+     *   @param entity {object}
+     */
+    _getFileInfo:function(id,entity){
       var self=this;
       if(!entity.imageWidth){
-         if(id.indexOf('.svg') > -1){
-            this._getSvgFileInfo(id,entity.url,function(file){
-              self._notifySelectedFileInfo(entity,file);
-            });
-         }else{
-            this._serviceGetFile(id,function(file){
-              self._notifySelectedFileInfo(entity,file);
-            });
-         } 
+        if(id.indexOf('.svg') > -1){
+          this._getSvgFileInfo(id,entity.url,function(file){
+            self._notifySelectedFileInfo(entity,file);
+          });
+        }else{
+          this._serviceGetFile(id,function(file){
+            self._notifySelectedFileInfo(entity,file);
+          });
+        }
       }
-   },
+    },
 
     /**
      *  On clipboard paste handler
@@ -1747,9 +1756,9 @@
 
 
     /**
-    *  On paper-card close
-    *  @param event {object}
-    */
+     *  On paper-card close
+     *  @param event {object}
+     */
     _onCardCloseClick:function(event){
       this._hideCard();
     },
@@ -1817,9 +1826,9 @@
 
 
     /**
-    *   Show paper-card
-    */
-     _showCard:function(){
+     *   Show paper-card
+     */
+    _showCard:function(){
       this.$.paperCard.classList.remove('hide');
     },
 
@@ -1860,8 +1869,8 @@
 
 
     /**
-    *  Hide paper-card
-    */
+     *  Hide paper-card
+     */
     _hideCard:function(){
       this.$.paperCard.classList.add('hide');
     },
@@ -1884,12 +1893,12 @@
       })
               .get({}, function (err, result) {
                 if(!err){
-                   self._hideNotificationDelay();
-                   self.files = result.data;
-                   self._setActiveFilesAsync();
-                   self._totalFiles = result.pagination.count;
-                   self._setPaginationData(result.pagination);
-                   self._setLibraryFilesMessage();
+                  self._hideNotificationDelay();
+                  self.files = result.data;
+                  self._setActiveFilesAsync();
+                  self._totalFiles = result.pagination.count;
+                  self._setPaginationData(result.pagination);
+                  self._setLibraryFilesMessage();
                 }
               });
     },
@@ -1925,39 +1934,39 @@
     },
 
     /**
-    *   Get File
-    *   @param id {string}
-    *   @param callback {function}
-    */
+     *   Get File
+     *   @param id {string}
+     *   @param callback {function}
+     */
     _serviceGetFile:function(id,callback){
-        var self=this;
-        var Service = this._service;
-        Service.get({id:id},function(err,data){
-          if(!err) callback(data);
-          else self._showNotification('Error retrieving file');
-        });
+      var self=this;
+      var Service = this._service;
+      Service.get({id:id},function(err,data){
+        if(!err) callback(data);
+        else self._showNotification('Error retrieving file');
+      });
     },
 
     /**
-    *   Get File
-    *   @param id {string}
-    *   @param src {string}
-    *   @param callback {function}
-    */
+     *   Get File
+     *   @param id {string}
+     *   @param src {string}
+     *   @param callback {function}
+     */
     _getSvgFileInfo:function(id,src,callback){
-        try{
-          var file={};
-          file.id=id;
-          var img = new Image();
-          img.onload = function(){
-             file.imageWidth=img.width + 'px';
-             file.imageHeight=img.height + 'px';
-             callback(file);
-          };
-          img.src = src
-        }catch(ex){
-          this._showNotification('Error retrieving file');
-        }
+      try{
+        var file={};
+        file.id=id;
+        var img = new Image();
+        img.onload = function(){
+          file.imageWidth=img.width + 'px';
+          file.imageHeight=img.height + 'px';
+          callback(file);
+        };
+        img.src = src
+      }catch(ex){
+        this._showNotification('Error retrieving file');
+      }
     },
 
 
@@ -2066,12 +2075,12 @@
     },
 
     _notifySelectedFileInfo:function(entity,file){
-       entity.imageWidth=file.imageWidth;
-       entity.imageHeight=file.imageHeight;
-       this.selectedFile.imageWidth=file.imageWidth;
-       this.selectedFile.imageHeight=file.imageHeight;
-       this.notifyPath('selectedFile.imageWidth',file.imageWidth);
-       this.notifyPath('selectedFile.imageHeight',file.imageHeight);
+      entity.imageWidth=file.imageWidth;
+      entity.imageHeight=file.imageHeight;
+      this.selectedFile.imageWidth=file.imageWidth;
+      this.selectedFile.imageHeight=file.imageHeight;
+      this.notifyPath('selectedFile.imageWidth',file.imageWidth);
+      this.notifyPath('selectedFile.imageHeight',file.imageHeight);
     },
 
 
@@ -2631,9 +2640,9 @@
     },
 
 
-     /**
-      *  Reset camera aside UI
-      */
+    /**
+     *  Reset camera aside UI
+     */
     _resetCameraContainer:function(){
       this.$.cameraContainer.classList.remove('active');
       this.$.cameraImage.removeAttribute('src');
@@ -2733,7 +2742,7 @@
      *   @public
      */
     show: function (params) {
-     this._show(params);
+      this._show(params);
     },
 
     /**
