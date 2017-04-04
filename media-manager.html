@@ -1556,6 +1556,7 @@
         var entity = this._getSelectedEntityFromSelectedFiles(id);
         this._setSelectedFile(entity);
         this._setCameraSelectedImageUrl(entity);
+        this.$.imageInfo.innerHTML = entity.id;
       }
     },
 
