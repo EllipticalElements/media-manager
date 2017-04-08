@@ -28,6 +28,7 @@
   --media-manager-accent-font-color: #fff
   --media-manager-primary-color: #3899ec
   --media-manager-primary-font-color: #fff
+  --media-manager-primary-color-hover: #4eb7f5
   --media-manager-secondary-color:#fb7d33
   --media-manager-secondary-font-color: #fff
   --media-manager-text-color: #646464
@@ -42,6 +43,7 @@
   --media-manager-info-transition: all 0.15s linear
   --media-manager-icon-color: #BDBDBD
   --media-manager-tooltip-color: #212121
+  --media-manager-name-width: 145px
 
 -->
 <style>
@@ -734,29 +736,30 @@
     :host > section > .main-container > section  .flex-library .file-container:hover{
       border:1px solid transparent;
       cursor:pointer;
-      box-shadow: 0 0 1px 2px #4eb7f5;
+      box-shadow: 0 0 1px 2px var(--media-manager-primary-color-hover, #4eb7f5);
       transition: var(--media-manager-info-transition, all 0.15s linear);
     }
 
     :host > section > .main-container > section  .flex-library .file-container[active]{
       border:1px solid transparent;
       cursor:pointer;
-      box-shadow: 0 0 0 3px #3899ec;
+      box-shadow: 0 0 0 3px var(--media-manager-primary-color, #3899ec);
       transition: var(--media-manager-transition, all 0.25s linear);
     }
 
     :host > section > .main-container > section  .flex-library .file-container[active]:hover{
-      box-shadow: 0 0 0 3px #3899ec;
+      box-shadow: 0 0 0 3px var(--media-manager-primary-color, #3899ec);
     }
 
     :host > section > .main-container > section  .flex-library .file-name{
       font-size:12px;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-justify-content: center;
-      justify-content: center;
       color:var(--media-manager-icon-color, #BDBDBD);
       font-family:'robotomedium';
+      text-align: center;
+      width: var(--media-manager-name-width, 145px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     :host > section > .main-container > section  .flex-library .file-container>.file-inner-container{
@@ -872,7 +875,7 @@
     <header>
       <h6>[[mainTitle]]</h6>
       <div class="search">
-        <ui-input-addon icon-class="icon-search" id="searchInput" handle-event="true"></ui-input-addon>
+        <ui-input-addon icon-class="icon-search" id="searchInput" handle-event="true" icon="search"></ui-input-addon>
       </div>
       <div>
         <div class="icon-container">
@@ -1209,6 +1212,10 @@
         value:null
       },
 
+      searchProperty:{
+        type:String,
+        value:'id'
+      },
 
       _currentContainerId: {
         type: String,
@@ -1918,10 +1925,12 @@
       this._currentPage = page;
       var service = new Service();
       this._showNotificationDelay();
+      var filter={};
+      filter[this.searchProperty]=term;
       service.paginate({
         baseUrl: '', rawUrl: '', page: page, pageSize: pageSize
       })
-              .filter({id:term})
+              .filter(filter)
               .get({}, function (err, result) {
                 if(!err){
                   self._hideNotificationDelay();
